@@ -1,19 +1,11 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import RepoCard from "./RepoCard";
+import { SAMPLE_REPOS } from "../test/fixtures";
 
 interface ReposTabProps {
   username: string;
 }
-
-const SAMPLE_REPOS = [
-  { name: "LotoPetsPlay", description: "Next.js pet-themed gaming platform with Supabase auth and Clean Architecture", language: "TypeScript", stars: 12, forks: 3, updatedAt: "2 days ago" },
-  { name: "MyTodo-back", description: "FastAPI backend with JWT auth, SQLAlchemy 2.0, Alembic migrations", language: "Python", stars: 8, forks: 2, updatedAt: "1 week ago" },
-  { name: "gh-dash", description: "GitHub Personal Dashboard built with Astro + React + Tailwind v4", language: "TypeScript", stars: 5, forks: 1, updatedAt: "just now" },
-  { name: "portfolio", description: "Personal portfolio site with dark mode and MDX blog", language: "JavaScript", stars: 3, forks: 0, updatedAt: "3 weeks ago" },
-  { name: "dotfiles", description: "My personal dotfiles and development environment setup", language: "Shell", stars: 2, forks: 1, updatedAt: "1 month ago" },
-  { name: "rust-adventures", description: "Learning Rust through small projects and algorithms", language: "Rust", stars: 7, forks: 0, updatedAt: "2 months ago" },
-];
 
 type SortKey = "stars" | "updated";
 

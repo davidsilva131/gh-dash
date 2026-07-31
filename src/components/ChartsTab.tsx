@@ -4,42 +4,11 @@ import {
   LineChart, Line, ResponsiveContainer,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SAMPLE_CHARTS_LANGUAGES as LANGUAGES, SAMPLE_STARS as STARS_PER_REPO, SAMPLE_ACTIVITY as ACTIVITY_DATA, SAMPLE_CONTRIBUTION_WEEKS as CONTRIBUTION_WEEKS } from "../test/fixtures";
 
 interface ChartsTabProps {
   username: string;
 }
-
-const LANGUAGES = [
-  { name: "TypeScript", value: 35, color: "#3178c6" },
-  { name: "JavaScript", value: 28, color: "#f1e05a" },
-  { name: "Python", value: 18, color: "#3572A5" },
-  { name: "CSS/HTML", value: 12, color: "#e34c26" },
-  { name: "Rust", value: 5, color: "#dea584" },
-  { name: "Other", value: 2, color: "#8b949e" },
-];
-
-const STARS_PER_REPO = [
-  { name: "LotoPetsPlay", stars: 12 },
-  { name: "MyTodo-back", stars: 8 },
-  { name: "rust-adventures", stars: 7 },
-  { name: "gh-dash", stars: 5 },
-  { name: "portfolio", stars: 3 },
-  { name: "dotfiles", stars: 2 },
-];
-
-const ACTIVITY_DATA = [
-  { month: "Jan", commits: 48, prs: 6, issues: 4 },
-  { month: "Feb", commits: 52, prs: 8, issues: 3 },
-  { month: "Mar", commits: 38, prs: 5, issues: 7 },
-  { month: "Apr", commits: 65, prs: 10, issues: 5 },
-  { month: "May", commits: 42, prs: 7, issues: 2 },
-  { month: "Jun", commits: 55, prs: 9, issues: 6 },
-  { month: "Jul", commits: 35, prs: 4, issues: 3 },
-];
-
-const CONTRIBUTION_WEEKS = Array.from({ length: 52 }, () => ({
-  days: Array.from({ length: 7 }, () => Math.floor(Math.random() * 5)),
-}));
 
 function getContributionColor(count: number): string {
   if (count === 0) return "#1a1a1a";

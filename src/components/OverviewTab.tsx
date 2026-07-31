@@ -3,34 +3,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import StatCard from "./StatCard";
+import { SAMPLE_USER_DATA, SAMPLE_LANGUAGES, SAMPLE_CONTRIBUTION_WEEKS } from "../test/fixtures";
 
 interface OverviewTabProps {
   username: string;
 }
-
-const SAMPLE_DATA = {
-  name: "David Silva",
-  login: "davidsilva131",
-  bio: "Full-stack developer. Building with Next.js, Astro, React, and Tailwind. Open source enthusiast.",
-  avatarUrl: "https://avatars.githubusercontent.com/u/116703237?v=4",
-  followers: 42,
-  following: 28,
-  publicRepos: 57,
-  totalStars: 186,
-  company: "FishingBugs",
-  location: "Chile",
-  blog: "",
-  languages: [
-    { name: "TypeScript", value: 35, color: "#3178c6" },
-    { name: "JavaScript", value: 28, color: "#f1e05a" },
-    { name: "Python", value: 18, color: "#3572A5" },
-    { name: "CSS/HTML", value: 12, color: "#e34c26" },
-    { name: "Other", value: 7, color: "#8b949e" },
-  ],
-  contributionWeeks: Array.from({ length: 52 }, () => ({
-    days: Array.from({ length: 7 }, () => Math.floor(Math.random() * 5)),
-  })),
-};
 
 function getContributionLevel(count: number) {
   if (count === 0) return "bg-border/30";
@@ -41,7 +18,7 @@ function getContributionLevel(count: number) {
 }
 
 export default function OverviewTab({ username }: OverviewTabProps) {
-  const data = SAMPLE_DATA;
+  const data = SAMPLE_USER_DATA;
 
   return (
     <div className="space-y-6">
