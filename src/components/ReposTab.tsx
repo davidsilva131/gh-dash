@@ -28,6 +28,7 @@ export default function ReposTab({ username }: ReposTabProps) {
           <Button
             variant={sortBy === "stars" ? "default" : "outline"}
             size="sm"
+            aria-pressed={sortBy === "stars"}
             onClick={() => setSortBy("stars")}
           >
             Most Stars
@@ -35,6 +36,7 @@ export default function ReposTab({ username }: ReposTabProps) {
           <Button
             variant={sortBy === "updated" ? "default" : "outline"}
             size="sm"
+            aria-pressed={sortBy === "updated"}
             onClick={() => setSortBy("updated")}
           >
             Recently Updated

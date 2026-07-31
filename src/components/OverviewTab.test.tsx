@@ -2,19 +2,20 @@ import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 import OverviewTab from "./OverviewTab";
 import StatCard from "./StatCard";
+import { SAMPLE_USER, VISIBLE_CONTRIBUTION_WEEKS } from "../test/fixtures";
 
 describe("OverviewTab", () => {
   it("renders profile info from sample data", () => {
-    render(<OverviewTab username="davidsilva131" />);
+    render(<OverviewTab username={SAMPLE_USER} />);
     expect(screen.getByText("David Silva")).toBeInTheDocument();
-    expect(screen.getByText("@davidsilva131")).toBeInTheDocument();
+    expect(screen.getByText("@" + SAMPLE_USER)).toBeInTheDocument();
     expect(screen.getByText(/full-stack developer/i)).toBeInTheDocument();
     expect(screen.getByText("FishingBugs")).toBeInTheDocument();
     expect(screen.getByText("Chile")).toBeInTheDocument();
   });
 
   it("renders the four stat cards with labels and values", () => {
-    render(<OverviewTab username="davidsilva131" />);
+    render(<OverviewTab username={SAMPLE_USER} />);
     expect(screen.getByText("Repositories")).toBeInTheDocument();
     expect(screen.getByText("57")).toBeInTheDocument();
     expect(screen.getByText("Total Stars")).toBeInTheDocument();
@@ -26,17 +27,17 @@ describe("OverviewTab", () => {
   });
 
   it("renders language bars with names and percentages", () => {
-    render(<OverviewTab username="davidsilva131" />);
+    render(<OverviewTab username={SAMPLE_USER} />);
     expect(screen.getByText("TypeScript")).toBeInTheDocument();
     expect(screen.getByText("35%")).toBeInTheDocument();
     expect(screen.getByText("Python")).toBeInTheDocument();
     expect(screen.getByText("18%")).toBeInTheDocument();
   });
 
-  it("renders the contribution heatmap with 26 weeks of cells", () => {
-    render(<OverviewTab username="davidsilva131" />);
+  it("renders the contribution heatmap with the visible weeks of cells", () => {
+    render(<OverviewTab username={SAMPLE_USER} />);
     const cells = screen.getAllByTitle(/contributions/i);
-    expect(cells).toHaveLength(26 * 7);
+    expect(cells).toHaveLength(VISIBLE_CONTRIBUTION_WEEKS * 7);
   });
 });
 
