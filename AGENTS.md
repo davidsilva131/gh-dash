@@ -26,3 +26,16 @@ https://github.com/davidsilva131/gh-dash/issues/1
 - Chat in Spanish, GitHub artifacts in English
 - shadcn/ui components in src/components/ui/
 - Environment variables in .env (see .env.example)
+## Agent skills
+
+### Issue tracker
+
+Issues live on GitHub Issues. See docs/agents/issue-tracker.md.
+
+### Triage labels
+
+Five canonical labels: needs-triage, needs-info, ready-for-agent, ready-for-human, wontfix. See docs/agents/triage-labels.md.
+
+### Domain docs
+
+Single-context layout. See docs/agents/domain.md.
