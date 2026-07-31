@@ -4,6 +4,8 @@ import {
   LineChart, Line, ResponsiveContainer,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import ErrorDisplay from "./ErrorDisplay";
+import { Skeleton } from "@/components/ui/skeleton";
 import { SAMPLE_CHARTS_LANGUAGES as LANGUAGES, SAMPLE_STARS as STARS_PER_REPO, SAMPLE_ACTIVITY as ACTIVITY_DATA, SAMPLE_CONTRIBUTION_WEEKS as CONTRIBUTION_WEEKS } from "../test/fixtures";
 import type { GitHubUserData, ErrorState } from "../lib/types";
 
@@ -24,14 +26,22 @@ function getContributionColor(count: number): string {
 
 export default function ChartsTab({ username, data, isLoading, error }: ChartsTabProps) {
   if (isLoading) {
-    return <div className="p-8 text-center text-muted-foreground" data-testid="charts-loading">Loading charts...</div>;
+    return (
+      <div data-testid="charts-loading" role="status" aria-label="Loading charts" className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Skeleton className="h-[280px] w-full rounded-xl" />
+          <Skeleton className="h-[280px] w-full rounded-xl" />
+        </div>
+        <Skeleton className="h-64 w-full rounded-xl" />
+        <Skeleton className="h-[300px] w-full rounded-xl" />
+      </div>
+    );
   }
 
   if (error) {
     return (
-      <div className="p-8 text-center" data-testid="charts-error">
-        <p className="text-destructive font-semibold">Error</p>
-        <p className="text-muted-foreground text-sm mt-1">{error.message}</p>
+      <div data-testid="charts-error">
+        <ErrorDisplay error={error} />
       </div>
     );
   }

@@ -40,20 +40,24 @@ describe("ReposTab", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders a loading placeholder when isLoading is true", () => {
-    render(<ReposTab username={SAMPLE_USER} isLoading />);
+  it("renders skeletons when isLoading is true", () => {
+    const { container } = render(<ReposTab username={SAMPLE_USER} isLoading />);
     expect(screen.getByTestId("repos-loading")).toBeInTheDocument();
+    expect(screen.getByRole("status", { name: "Loading repositories" })).toBeInTheDocument();
+    expect(container.querySelectorAll("[data-slot='skeleton']").length).toBeGreaterThan(0);
   });
 
-  it("renders an error message when an error is provided", () => {
+  it("renders the rate_limited error UI with a countdown", () => {
+    const retryAfter = new Date(Date.now() + 5 * 60 * 1000).toISOString();
     render(
       <ReposTab
         username={SAMPLE_USER}
-        error={{ type: "rate_limited", message: "Rate limit exceeded" }}
+        error={{ type: "rate_limited", message: "Rate limit exceeded", retryAfter }}
       />
     );
     expect(screen.getByTestId("repos-error")).toBeInTheDocument();
-    expect(screen.getByText("Rate limit exceeded")).toBeInTheDocument();
+    expect(screen.getByText("Rate limit hit")).toBeInTheDocument();
+    expect(screen.getByText("Try again in 5 minutes")).toBeInTheDocument();
   });
 
   it("renders repos from the data prop when provided", () => {

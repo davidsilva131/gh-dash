@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import StatCard from "./StatCard";
+import ErrorDisplay from "./ErrorDisplay";
+import { Skeleton } from "@/components/ui/skeleton";
 import { SAMPLE_USER_DATA, SAMPLE_LANGUAGES, SAMPLE_CONTRIBUTION_WEEKS } from "../test/fixtures";
 import type { GitHubUserData, ErrorState } from "../lib/types";
 
@@ -23,14 +25,38 @@ function getContributionLevel(count: number) {
 
 export default function OverviewTab({ username, data, isLoading, error }: OverviewTabProps) {
   if (isLoading) {
-    return <div className="p-8 text-center text-muted-foreground" data-testid="overview-loading">Loading {username}'s profile...</div>;
+    return (
+      <div data-testid="overview-loading" role="status" aria-label="Loading profile" className="space-y-6">
+        <Skeleton className="h-32 w-full rounded-xl" />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-24 w-full rounded-xl" />
+          ))}
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-3">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Skeleton key={i} className="h-4 w-full rounded-full" />
+            ))}
+          </div>
+          <div className="flex gap-1 overflow-x-auto">
+            {Array.from({ length: 26 }).map((_, wi) => (
+              <div key={wi} className="flex flex-col gap-1">
+                {Array.from({ length: 7 }).map((_, di) => (
+                  <Skeleton key={di} className="w-3 h-3 rounded-sm" />
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (error) {
     return (
-      <div className="p-8 text-center" data-testid="overview-error">
-        <p className="text-destructive font-semibold">Error</p>
-        <p className="text-muted-foreground text-sm mt-1">{error.message}</p>
+      <div data-testid="overview-error">
+        <ErrorDisplay error={error} />
       </div>
     );
   }

@@ -37,6 +37,7 @@ describe("ActivityTab", () => {
     );
     expect(screen.getByTestId("activity-error")).toBeInTheDocument();
     expect(screen.getByText("Could not reach GitHub")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Retry" })).toBeInTheDocument();
   });
 
   it("renders events from the data prop when provided", () => {

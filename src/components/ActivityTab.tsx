@@ -1,4 +1,6 @@
 import ActivityEvent from "./ActivityEvent";
+import ErrorDisplay from "./ErrorDisplay";
+import { Skeleton } from "@/components/ui/skeleton";
 import { SAMPLE_EVENTS } from "../test/fixtures";
 import type { GitHubUserData, ErrorState } from "../lib/types";
 
@@ -11,14 +13,20 @@ interface ActivityTabProps {
 
 export default function ActivityTab({ username, data, isLoading, error }: ActivityTabProps) {
   if (isLoading) {
-    return <div className="p-8 text-center text-muted-foreground" data-testid="activity-loading">Loading activity...</div>;
+    return (
+      <div data-testid="activity-loading" role="status" aria-label="Loading activity" className="space-y-2">
+        <Skeleton className="h-4 w-48 rounded-full mb-4" />
+        {Array.from({ length: 6 }).map((_, i) => (
+          <Skeleton key={i} className="h-16 w-full rounded-xl" />
+        ))}
+      </div>
+    );
   }
 
   if (error) {
     return (
-      <div className="p-8 text-center" data-testid="activity-error">
-        <p className="text-destructive font-semibold">Error</p>
-        <p className="text-muted-foreground text-sm mt-1">{error.message}</p>
+      <div data-testid="activity-error">
+        <ErrorDisplay error={error} />
       </div>
     );
   }

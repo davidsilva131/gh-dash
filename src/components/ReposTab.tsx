@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import RepoCard from "./RepoCard";
+import ErrorDisplay from "./ErrorDisplay";
+import { Skeleton } from "@/components/ui/skeleton";
 import { SAMPLE_REPOS } from "../test/fixtures";
 import type { GitHubUserData, ErrorState } from "../lib/types";
 
@@ -17,14 +19,22 @@ export default function ReposTab({ username, data, isLoading, error }: ReposTabP
   const [sortBy, setSortBy] = useState<SortKey>("stars");
 
   if (isLoading) {
-    return <div className="p-8 text-center text-muted-foreground" data-testid="repos-loading">Loading repositories...</div>;
+    return (
+      <div data-testid="repos-loading" role="status" aria-label="Loading repositories" className="space-y-4">
+        <Skeleton className="h-4 w-40 rounded-full" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Skeleton key={i} className="h-28 w-full rounded-xl" />
+          ))}
+        </div>
+      </div>
+    );
   }
 
   if (error) {
     return (
-      <div className="p-8 text-center" data-testid="repos-error">
-        <p className="text-destructive font-semibold">Error</p>
-        <p className="text-muted-foreground text-sm mt-1">{error.message}</p>
+      <div data-testid="repos-error">
+        <ErrorDisplay error={error} />
       </div>
     );
   }

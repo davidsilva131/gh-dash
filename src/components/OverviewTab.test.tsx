@@ -40,12 +40,14 @@ describe("OverviewTab", () => {
     expect(cells).toHaveLength(VISIBLE_CONTRIBUTION_WEEKS * 7);
   });
 
-  it("renders a loading placeholder when isLoading is true", () => {
-    render(<OverviewTab username={SAMPLE_USER} isLoading />);
+  it("renders skeletons when isLoading is true", () => {
+    const { container } = render(<OverviewTab username={SAMPLE_USER} isLoading />);
     expect(screen.getByTestId("overview-loading")).toBeInTheDocument();
+    expect(screen.getByRole("status", { name: "Loading profile" })).toBeInTheDocument();
+    expect(container.querySelectorAll("[data-slot='skeleton']").length).toBeGreaterThan(0);
   });
 
-  it("renders an error message when an error is provided", () => {
+  it("renders the not_found error UI when a user does not exist", () => {
     render(
       <OverviewTab
         username={SAMPLE_USER}
@@ -53,8 +55,20 @@ describe("OverviewTab", () => {
       />
     );
     expect(screen.getByTestId("overview-error")).toBeInTheDocument();
-    expect(screen.getByText("Error")).toBeInTheDocument();
+    expect(screen.getByRole("alert")).toBeInTheDocument();
     expect(screen.getByText("User not found")).toBeInTheDocument();
+    expect(screen.getByText("Check the username and try again.")).toBeInTheDocument();
+  });
+
+  it("renders the network error UI with a retry button", () => {
+    render(
+      <OverviewTab
+        username={SAMPLE_USER}
+        error={{ type: "network", message: "Could not reach GitHub" }}
+      />
+    );
+    expect(screen.getByText("Could not reach GitHub")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Retry" })).toBeInTheDocument();
   });
 
   it("renders data from the data prop when provided", () => {

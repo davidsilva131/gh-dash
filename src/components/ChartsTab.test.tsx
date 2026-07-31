@@ -19,9 +19,11 @@ describe("ChartsTab", () => {
     expect(screen.getByText("More")).toBeInTheDocument();
   });
 
-  it("renders a loading placeholder when isLoading is true", () => {
-    render(<ChartsTab username={SAMPLE_USER} isLoading />);
+  it("renders skeletons when isLoading is true", () => {
+    const { container } = render(<ChartsTab username={SAMPLE_USER} isLoading />);
     expect(screen.getByTestId("charts-loading")).toBeInTheDocument();
+    expect(screen.getByRole("status", { name: "Loading charts" })).toBeInTheDocument();
+    expect(container.querySelectorAll("[data-slot='skeleton']").length).toBeGreaterThan(0);
   });
 
   it("renders an error message when an error is provided", () => {
