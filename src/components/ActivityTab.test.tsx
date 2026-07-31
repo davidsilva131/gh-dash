@@ -3,17 +3,18 @@ import { render, screen } from "@testing-library/react";
 import ActivityTab from "./ActivityTab";
 import ActivityEvent from "./ActivityEvent";
 import { SAMPLE_USER } from "../test/fixtures";
+import { SAMPLE_USER_DATA } from "../test/fixtures";
 
 describe("ActivityTab", () => {
   it("renders the header with the username", () => {
-    render(<ActivityTab username={SAMPLE_USER} />);
+    render(<ActivityTab username={SAMPLE_USER} data={SAMPLE_USER_DATA} />);
     expect(
       screen.getByText("Recent activity from " + SAMPLE_USER)
     ).toBeInTheDocument();
   });
 
   it("renders all sample events with their badges", () => {
-    render(<ActivityTab username={SAMPLE_USER} />);
+    render(<ActivityTab username={SAMPLE_USER} data={SAMPLE_USER_DATA} />);
     expect(screen.getByText("Pushed 3 commits to main")).toBeInTheDocument();
     expect(screen.getByText("Starred the repository")).toBeInTheDocument();
     expect(screen.getAllByText("Push")).toHaveLength(2);
@@ -24,7 +25,7 @@ describe("ActivityTab", () => {
   });
 
   it("renders a loading placeholder when isLoading is true", () => {
-    render(<ActivityTab username={SAMPLE_USER} isLoading />);
+    render(<ActivityTab username={SAMPLE_USER} data={SAMPLE_USER_DATA} isLoading />);
     expect(screen.getByTestId("activity-loading")).toBeInTheDocument();
   });
 
@@ -32,6 +33,7 @@ describe("ActivityTab", () => {
     render(
       <ActivityTab
         username={SAMPLE_USER}
+        data={SAMPLE_USER_DATA}
         error={{ type: "network", message: "Could not reach GitHub" }}
       />
     );

@@ -4,22 +4,23 @@ import userEvent from "@testing-library/user-event";
 import ReposTab from "./ReposTab";
 import RepoCard from "./RepoCard";
 import { SAMPLE_USER } from "../test/fixtures";
+import { SAMPLE_USER_DATA } from "../test/fixtures";
 
 describe("ReposTab", () => {
   it("renders the repository count", () => {
-    render(<ReposTab username={SAMPLE_USER} />);
+    render(<ReposTab username={SAMPLE_USER} data={SAMPLE_USER_DATA} />);
     expect(screen.getByText("6 repositories")).toBeInTheDocument();
   });
 
   it("renders a repo card for each sample repository", () => {
-    render(<ReposTab username={SAMPLE_USER} />);
+    render(<ReposTab username={SAMPLE_USER} data={SAMPLE_USER_DATA} />);
     expect(screen.getByText("LotoPetsPlay")).toBeInTheDocument();
     expect(screen.getByText("gh-dash")).toBeInTheDocument();
     expect(screen.getByText("dotfiles")).toBeInTheDocument();
   });
 
   it("marks Most Stars as the active sort by default", () => {
-    render(<ReposTab username={SAMPLE_USER} />);
+    render(<ReposTab username={SAMPLE_USER} data={SAMPLE_USER_DATA} />);
     expect(
       screen.getByRole("button", { name: "Most Stars", pressed: true })
     ).toBeInTheDocument();
@@ -30,7 +31,7 @@ describe("ReposTab", () => {
 
   it("toggles the active sort to Recently Updated", async () => {
     const user = userEvent.setup();
-    render(<ReposTab username={SAMPLE_USER} />);
+    render(<ReposTab username={SAMPLE_USER} data={SAMPLE_USER_DATA} />);
     await user.click(screen.getByRole("button", { name: "Recently Updated" }));
     expect(
       screen.getByRole("button", { name: "Recently Updated", pressed: true })
@@ -41,7 +42,7 @@ describe("ReposTab", () => {
   });
 
   it("renders skeletons when isLoading is true", () => {
-    const { container } = render(<ReposTab username={SAMPLE_USER} isLoading />);
+    const { container } = render(<ReposTab username={SAMPLE_USER} data={SAMPLE_USER_DATA} isLoading />);
     expect(screen.getByTestId("repos-loading")).toBeInTheDocument();
     expect(screen.getByRole("status", { name: "Loading repositories" })).toBeInTheDocument();
     expect(container.querySelectorAll("[data-slot='skeleton']").length).toBeGreaterThan(0);
@@ -52,6 +53,7 @@ describe("ReposTab", () => {
     render(
       <ReposTab
         username={SAMPLE_USER}
+        data={SAMPLE_USER_DATA}
         error={{ type: "rate_limited", message: "Rate limit exceeded", retryAfter }}
       />
     );

@@ -3,22 +3,30 @@ import { Button } from "@/components/ui/button";
 import RepoCard from "./RepoCard";
 import ErrorDisplay from "./ErrorDisplay";
 import { Skeleton } from "@/components/ui/skeleton";
-import { SAMPLE_REPOS } from "../test/fixtures";
 import type { GitHubUserData, ErrorState } from "../lib/types";
 
 interface ReposTabProps {
   username: string;
-  data?: GitHubUserData;
+  data: GitHubUserData;
   isLoading?: boolean;
   error?: ErrorState | null;
+  onRetry?: () => void;
 }
 
 type SortKey = "stars" | "updated";
 
-export default function ReposTab({ username, data, isLoading, error }: ReposTabProps) {
+export default function ReposTab({ username, data, isLoading, error, onRetry }: ReposTabProps) {
   const [sortBy, setSortBy] = useState<SortKey>("stars");
 
-  if (isLoading) {
+  if (error) {
+    return (
+      <div data-testid="repos-error">
+        <ErrorDisplay error={error} onRetry={onRetry} />
+      </div>
+    );
+  }
+
+  if (isLoading || !data) {
     return (
       <div data-testid="repos-loading" role="status" aria-label="Loading repositories" className="space-y-4">
         <Skeleton className="h-4 w-40 rounded-full" />
@@ -31,15 +39,7 @@ export default function ReposTab({ username, data, isLoading, error }: ReposTabP
     );
   }
 
-  if (error) {
-    return (
-      <div data-testid="repos-error">
-        <ErrorDisplay error={error} />
-      </div>
-    );
-  }
-
-  const repos = data?.repos ?? SAMPLE_REPOS;
+  const repos = data.repos;
 
   return (
     <div className="space-y-4">

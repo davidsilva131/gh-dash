@@ -6,14 +6,14 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ErrorDisplay from "./ErrorDisplay";
 import { Skeleton } from "@/components/ui/skeleton";
-import { SAMPLE_CHARTS_LANGUAGES as LANGUAGES, SAMPLE_STARS as STARS_PER_REPO, SAMPLE_ACTIVITY as ACTIVITY_DATA, SAMPLE_CONTRIBUTION_WEEKS as CONTRIBUTION_WEEKS } from "../test/fixtures";
 import type { GitHubUserData, ErrorState } from "../lib/types";
 
 interface ChartsTabProps {
   username: string;
-  data?: GitHubUserData;
+  data: GitHubUserData;
   isLoading?: boolean;
   error?: ErrorState | null;
+  onRetry?: () => void;
 }
 
 function getContributionColor(count: number): string {
@@ -24,8 +24,29 @@ function getContributionColor(count: number): string {
   return "#39d353";
 }
 
-export default function ChartsTab({ username, data, isLoading, error }: ChartsTabProps) {
-  if (isLoading) {
+
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+function monthlyCommitsFromContributions(contributions: { days: number[] }[]): { month: string; commits: number }[] {
+  const days = contributions.flatMap((week) => week.days);
+  const perMonth = new Array<number>(12).fill(0);
+  days.forEach((count, i) => {
+    const bucket = Math.min(11, Math.floor(i / 30));
+    perMonth[bucket] += count;
+  });
+  return MONTHS.map((month, i) => ({ month, commits: perMonth[i] }));
+}
+
+export default function ChartsTab({ username, data, isLoading, error, onRetry }: ChartsTabProps) {
+  if (error) {
+    return (
+      <div data-testid="charts-error">
+        <ErrorDisplay error={error} onRetry={onRetry} />
+      </div>
+    );
+  }
+
+  if (isLoading || !data) {
     return (
       <div data-testid="charts-loading" role="status" aria-label="Loading charts" className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -38,18 +59,10 @@ export default function ChartsTab({ username, data, isLoading, error }: ChartsTa
     );
   }
 
-  if (error) {
-    return (
-      <div data-testid="charts-error">
-        <ErrorDisplay error={error} />
-      </div>
-    );
-  }
-
-  const languages = data?.languages ?? LANGUAGES;
-  const starsPerRepo = data?.repos?.map((r) => ({ name: r.name, stars: r.stars })) ?? STARS_PER_REPO;
-  const contributionWeeks = data?.contributions ?? CONTRIBUTION_WEEKS;
-  const activityData = ACTIVITY_DATA; // No direct spec equivalent yet
+  const languages = data.languages;
+  const starsPerRepo = data.repos.map((r) => ({ name: r.name, stars: r.stars }));
+  const contributionWeeks = data.contributions;
+  const activityData = monthlyCommitsFromContributions(data.contributions);
 
   return (
     <div className="space-y-6">
@@ -164,8 +177,6 @@ export default function ChartsTab({ username, data, isLoading, error }: ChartsTa
                 }}
               />
               <Line type="monotone" dataKey="commits" stroke="#6366f1" strokeWidth={2} dot={{ fill: "#6366f1" }} name="Commits" />
-              <Line type="monotone" dataKey="prs" stroke="#22c55e" strokeWidth={2} dot={{ fill: "#22c55e" }} name="PRs" />
-              <Line type="monotone" dataKey="issues" stroke="#f59e0b" strokeWidth={2} dot={{ fill: "#f59e0b" }} name="Issues" />
             </LineChart>
           </ResponsiveContainer>
         </CardContent>

@@ -1,15 +1,18 @@
 // Shared fixtures for component tests.
+// All data conforms to the spec #16 types (src/lib/types.ts).
+
+import type { GitHubUserData, Repo, ActivityEvent, Language } from "../lib/types";
 
 // ---------------------------------------------------------------------------
-// Simple re-usable values (already used by the existing test suite)
+// Simple re-usable values
 // ---------------------------------------------------------------------------
 export const SAMPLE_USER = "davidsilva131";
 export const VISIBLE_CONTRIBUTION_WEEKS = 26;
 
 // ---------------------------------------------------------------------------
-// Languages
+// Languages (spec: Language[])
 // ---------------------------------------------------------------------------
-export const SAMPLE_LANGUAGES = [
+export const SAMPLE_LANGUAGES: Language[] = [
   { name: "TypeScript", value: 35, color: "#3178c6" },
   { name: "JavaScript", value: 28, color: "#f1e05a" },
   { name: "Python", value: 18, color: "#3572A5" },
@@ -18,116 +21,143 @@ export const SAMPLE_LANGUAGES = [
 ];
 
 // ---------------------------------------------------------------------------
-// Repositories
+// Repositories (spec: Repo[])
 // ---------------------------------------------------------------------------
-export const SAMPLE_REPOS = [
+export const SAMPLE_REPOS: Repo[] = [
   {
     name: "LotoPetsPlay",
-    description:
-      "Next.js pet-themed gaming platform with Supabase auth and Clean Architecture",
+    description: "Next.js pet-themed gaming platform with Supabase auth and Clean Architecture",
     language: "TypeScript",
+    languageColor: "#3178c6",
     stars: 12,
     forks: 3,
     updatedAt: "2 days ago",
+    url: "https://github.com/davidsilva131/LotoPetsPlay",
   },
   {
     name: "MyTodo-back",
     description: "FastAPI backend with JWT auth, SQLAlchemy 2.0, Alembic migrations",
     language: "Python",
+    languageColor: "#3572A5",
     stars: 8,
     forks: 2,
     updatedAt: "1 week ago",
+    url: "https://github.com/davidsilva131/MyTodo-back",
   },
   {
     name: "gh-dash",
     description: "GitHub Personal Dashboard built with Astro + React + Tailwind v4",
     language: "TypeScript",
+    languageColor: "#3178c6",
     stars: 5,
     forks: 1,
     updatedAt: "just now",
+    url: "https://github.com/davidsilva131/gh-dash",
   },
   {
     name: "portfolio",
     description: "Personal portfolio site with dark mode and MDX blog",
     language: "JavaScript",
+    languageColor: "#f1e05a",
     stars: 3,
     forks: 0,
     updatedAt: "3 weeks ago",
+    url: "https://github.com/davidsilva131/portfolio",
   },
   {
     name: "dotfiles",
     description: "My personal dotfiles and development environment setup",
     language: "Shell",
+    languageColor: "#89e051",
     stars: 2,
     forks: 1,
     updatedAt: "1 month ago",
+    url: "https://github.com/davidsilva131/dotfiles",
   },
   {
     name: "rust-adventures",
     description: "Learning Rust through small projects and algorithms",
     language: "Rust",
+    languageColor: "#dea584",
     stars: 7,
     forks: 0,
     updatedAt: "2 months ago",
+    url: "https://github.com/davidsilva131/rust-adventures",
   },
 ];
 
 // ---------------------------------------------------------------------------
-// Activity events
+// Activity events (spec: ActivityEvent[])
 // ---------------------------------------------------------------------------
-export const SAMPLE_EVENTS = [
+export const SAMPLE_EVENTS: ActivityEvent[] = [
   {
-    type: "PushEvent" as const,
-    repo: "davidsilva131/LotoPetsPlay",
+    id: "evt1",
+    type: "PushEvent",
     title: "Pushed 3 commits to main",
-    time: "2 hours ago",
+    repoName: "davidsilva131/LotoPetsPlay",
+    repoUrl: "https://github.com/davidsilva131/LotoPetsPlay",
+    createdAt: "2024-01-05T00:00:00Z",
   },
   {
-    type: "PullRequestEvent" as const,
-    repo: "davidsilva131/gh-dash",
+    id: "evt2",
+    type: "PullRequestEvent",
     title: "Opened PR: feat: add dashboard layout",
-    time: "5 hours ago",
+    repoName: "davidsilva131/gh-dash",
+    repoUrl: "https://github.com/davidsilva131/gh-dash",
+    createdAt: "2024-01-06T00:00:00Z",
   },
   {
-    type: "IssuesEvent" as const,
-    repo: "davidsilva131/MyTodo-back",
+    id: "evt3",
+    type: "IssuesEvent",
     title: "Opened issue: Add rate limiting",
-    time: "1 day ago",
+    repoName: "davidsilva131/MyTodo-back",
+    repoUrl: "https://github.com/davidsilva131/MyTodo-back",
+    createdAt: "2024-01-07T00:00:00Z",
   },
   {
-    type: "WatchEvent" as const,
-    repo: "F1shing-Bugs/LotoPetsPlay",
+    id: "evt4",
+    type: "WatchEvent",
     title: "Starred the repository",
-    time: "2 days ago",
+    repoName: "F1shing-Bugs/LotoPetsPlay",
+    repoUrl: "https://github.com/F1shing-Bugs/LotoPetsPlay",
+    createdAt: "2024-01-08T00:00:00Z",
   },
   {
-    type: "CreateEvent" as const,
-    repo: "davidsilva131/gh-dash",
+    id: "evt5",
+    type: "CreateEvent",
     title: "Created repository gh-dash",
-    time: "3 days ago",
+    repoName: "davidsilva131/gh-dash",
+    repoUrl: "https://github.com/davidsilva131/gh-dash",
+    createdAt: "2024-01-09T00:00:00Z",
   },
   {
-    type: "PushEvent" as const,
-    repo: "davidsilva131/portfolio",
+    id: "evt6",
+    type: "PushEvent",
     title: "Pushed 5 commits to main",
-    time: "4 days ago",
+    repoName: "davidsilva131/portfolio",
+    repoUrl: "https://github.com/davidsilva131/portfolio",
+    createdAt: "2024-01-10T00:00:00Z",
   },
   {
-    type: "ForkEvent" as const,
-    repo: "davidsilva131/rust-adventures",
+    id: "evt7",
+    type: "ForkEvent",
     title: "Forked from rust-lang/book",
-    time: "1 week ago",
+    repoName: "davidsilva131/rust-adventures",
+    repoUrl: "https://github.com/davidsilva131/rust-adventures",
+    createdAt: "2024-01-11T00:00:00Z",
   },
   {
-    type: "PullRequestEvent" as const,
-    repo: "davidsilva131/LotoPetsPlay",
+    id: "evt8",
+    type: "PullRequestEvent",
     title: "Merged PR: fix auth redirect loop",
-    time: "1 week ago",
+    repoName: "davidsilva131/LotoPetsPlay",
+    repoUrl: "https://github.com/davidsilva131/LotoPetsPlay",
+    createdAt: "2024-01-12T00:00:00Z",
   },
 ];
 
 // ---------------------------------------------------------------------------
-// Charts data
+// Charts data (chart-consumer shapes)
 // ---------------------------------------------------------------------------
 export const SAMPLE_CHARTS_LANGUAGES = [
   { name: "TypeScript", value: 35, color: "#3178c6" },
@@ -157,25 +187,34 @@ export const SAMPLE_ACTIVITY = [
   { month: "Jul", commits: 35, prs: 4, issues: 3 },
 ];
 
-export const SAMPLE_CONTRIBUTION_WEEKS = Array.from({ length: 52 }, () => ({
-  days: Array.from({ length: 7 }, () => Math.floor(Math.random() * 5)),
-}));
+export const SAMPLE_CONTRIBUTION_WEEKS: { days: number[] }[] = Array.from(
+  { length: 52 },
+  () => ({
+    days: Array.from({ length: 7 }, () => Math.floor(Math.random() * 5)),
+  }),
+);
 
 // ---------------------------------------------------------------------------
-// Full user profile (used by OverviewTab)
+// Full user dashboard payload (spec: GitHubUserData)
 // ---------------------------------------------------------------------------
-export const SAMPLE_USER_DATA = {
-  name: "David Silva",
-  login: "davidsilva131",
-  bio: "Full-stack developer. Building with Next.js, Astro, React, and Tailwind. Open source enthusiast.",
-  avatarUrl: "https://avatars.githubusercontent.com/u/116703237?v=4",
-  followers: 42,
-  following: 28,
-  publicRepos: 57,
-  totalStars: 186,
-  company: "FishingBugs",
-  location: "Chile",
-  blog: "",
+export const SAMPLE_USER_DATA: GitHubUserData = {
+  profile: {
+    login: "davidsilva131",
+    name: "David Silva",
+    avatarUrl: "https://avatars.githubusercontent.com/u/116703237?v=4",
+    bio: "Full-stack developer. Building with Next.js, Astro, React, and Tailwind. Open source enthusiast.",
+    company: "FishingBugs",
+    location: "Chile",
+    blog: "",
+    followers: 42,
+    following: 28,
+  },
+  stats: {
+    publicRepos: 57,
+    totalStars: 186,
+  },
   languages: SAMPLE_LANGUAGES,
-  contributionWeeks: SAMPLE_CONTRIBUTION_WEEKS,
+  contributions: SAMPLE_CONTRIBUTION_WEEKS,
+  repos: SAMPLE_REPOS,
+  activity: SAMPLE_EVENTS,
 };

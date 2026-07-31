@@ -5,14 +5,14 @@ import { Badge } from "@/components/ui/badge";
 import StatCard from "./StatCard";
 import ErrorDisplay from "./ErrorDisplay";
 import { Skeleton } from "@/components/ui/skeleton";
-import { SAMPLE_USER_DATA, SAMPLE_LANGUAGES, SAMPLE_CONTRIBUTION_WEEKS } from "../test/fixtures";
 import type { GitHubUserData, ErrorState } from "../lib/types";
 
 interface OverviewTabProps {
   username: string;
-  data?: GitHubUserData;
+  data: GitHubUserData;
   isLoading?: boolean;
   error?: ErrorState | null;
+  onRetry?: () => void;
 }
 
 function getContributionLevel(count: number) {
@@ -23,8 +23,16 @@ function getContributionLevel(count: number) {
   return "bg-accent";
 }
 
-export default function OverviewTab({ username, data, isLoading, error }: OverviewTabProps) {
-  if (isLoading) {
+export default function OverviewTab({ username, data, isLoading, error, onRetry }: OverviewTabProps) {
+  if (error) {
+    return (
+      <div data-testid="overview-error">
+        <ErrorDisplay error={error} onRetry={onRetry} />
+      </div>
+    );
+  }
+
+  if (isLoading || !data) {
     return (
       <div data-testid="overview-loading" role="status" aria-label="Loading profile" className="space-y-6">
         <Skeleton className="h-32 w-full rounded-xl" />
@@ -53,19 +61,8 @@ export default function OverviewTab({ username, data, isLoading, error }: Overvi
     );
   }
 
-  if (error) {
-    return (
-      <div data-testid="overview-error">
-        <ErrorDisplay error={error} />
-      </div>
-    );
-  }
-
-  // Use provided data when available, otherwise fall back to SAMPLE_USER_DATA (flat shape)
-  const profile = data?.profile ?? SAMPLE_USER_DATA;
-  const stats = data?.stats ?? { publicRepos: SAMPLE_USER_DATA.publicRepos, totalStars: SAMPLE_USER_DATA.totalStars };
-  const languages = data?.languages ?? SAMPLE_USER_DATA.languages;
-  const contributionWeeks = data?.contributions ?? SAMPLE_USER_DATA.contributionWeeks;
+  const { profile, stats, languages } = data;
+  const contributionWeeks = data.contributions;
 
   return (
     <div className="space-y-6">

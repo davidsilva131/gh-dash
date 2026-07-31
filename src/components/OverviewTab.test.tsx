@@ -3,10 +3,11 @@ import { render, screen } from "@testing-library/react";
 import OverviewTab from "./OverviewTab";
 import StatCard from "./StatCard";
 import { SAMPLE_USER, VISIBLE_CONTRIBUTION_WEEKS } from "../test/fixtures";
+import { SAMPLE_USER_DATA } from "../test/fixtures";
 
 describe("OverviewTab", () => {
   it("renders profile info from sample data", () => {
-    render(<OverviewTab username={SAMPLE_USER} />);
+    render(<OverviewTab username={SAMPLE_USER} data={SAMPLE_USER_DATA} />);
     expect(screen.getByText("David Silva")).toBeInTheDocument();
     expect(screen.getByText("@" + SAMPLE_USER)).toBeInTheDocument();
     expect(screen.getByText(/full-stack developer/i)).toBeInTheDocument();
@@ -15,7 +16,7 @@ describe("OverviewTab", () => {
   });
 
   it("renders the four stat cards with labels and values", () => {
-    render(<OverviewTab username={SAMPLE_USER} />);
+    render(<OverviewTab username={SAMPLE_USER} data={SAMPLE_USER_DATA} />);
     expect(screen.getByText("Repositories")).toBeInTheDocument();
     expect(screen.getByText("57")).toBeInTheDocument();
     expect(screen.getByText("Total Stars")).toBeInTheDocument();
@@ -27,7 +28,7 @@ describe("OverviewTab", () => {
   });
 
   it("renders language bars with names and percentages", () => {
-    render(<OverviewTab username={SAMPLE_USER} />);
+    render(<OverviewTab username={SAMPLE_USER} data={SAMPLE_USER_DATA} />);
     expect(screen.getByText("TypeScript")).toBeInTheDocument();
     expect(screen.getByText("35%")).toBeInTheDocument();
     expect(screen.getByText("Python")).toBeInTheDocument();
@@ -35,13 +36,13 @@ describe("OverviewTab", () => {
   });
 
   it("renders the contribution heatmap with the visible weeks of cells", () => {
-    render(<OverviewTab username={SAMPLE_USER} />);
+    render(<OverviewTab username={SAMPLE_USER} data={SAMPLE_USER_DATA} />);
     const cells = screen.getAllByTitle(/contributions/i);
     expect(cells).toHaveLength(VISIBLE_CONTRIBUTION_WEEKS * 7);
   });
 
   it("renders skeletons when isLoading is true", () => {
-    const { container } = render(<OverviewTab username={SAMPLE_USER} isLoading />);
+    const { container } = render(<OverviewTab username={SAMPLE_USER} data={SAMPLE_USER_DATA} isLoading />);
     expect(screen.getByTestId("overview-loading")).toBeInTheDocument();
     expect(screen.getByRole("status", { name: "Loading profile" })).toBeInTheDocument();
     expect(container.querySelectorAll("[data-slot='skeleton']").length).toBeGreaterThan(0);
@@ -51,6 +52,7 @@ describe("OverviewTab", () => {
     render(
       <OverviewTab
         username={SAMPLE_USER}
+        data={SAMPLE_USER_DATA}
         error={{ type: "not_found", message: "User not found" }}
       />
     );
@@ -64,6 +66,7 @@ describe("OverviewTab", () => {
     render(
       <OverviewTab
         username={SAMPLE_USER}
+        data={SAMPLE_USER_DATA}
         error={{ type: "network", message: "Could not reach GitHub" }}
       />
     );
