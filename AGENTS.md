@@ -8,10 +8,17 @@ GitHub Personal Dashboard - Astro + React + Tailwind v4 + shadcn/ui + Railway.
 - **UI**: React 19 islands + Tailwind v4 + shadcn/ui
 - **Data**: GitHub API (GraphQL + REST) with server-side PAT
 - **Deploy**: Railway (Node.js container)
+- **Package manager**: pnpm
 
 ## Quick Commands
 
-
+```sh
+pnpm install          # Install dependencies
+pnpm dev              # Start dev server
+pnpm build            # Production build
+pnpm preview          # Preview production build
+pnpm start            # Start production server (node ./dist/server/entry.mjs)
+```
 
 ## Project Structure
 
