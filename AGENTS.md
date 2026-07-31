@@ -46,3 +46,12 @@ Five canonical labels: needs-triage, needs-info, ready-for-agent, ready-for-huma
 ### Domain docs
 
 Single-context layout. See docs/agents/domain.md.
+
+## Testing
+
+Run the suite with pnpm test (single run) or pnpm test:watch (watch mode).
+
+- **Runner**: Vitest 4 + jsdom. React components tested with React Testing Library + user-event; matchers from jest-dom.
+- **Test placement**: .test.ts / .test.tsx files colocated next to the component or module they test. Astro only bundles modules reachable from pages, so colocated tests are inert at build time.
+- **Setup**: src/test/setup.tsx registers jest-dom matchers and mocks Recharts ResponsiveContainer (jsdom has no real layout).
+- **Conventions**: assert user-visible behavior only — accessible roles, labels, text, and interactions. No snapshot tests, no class-based selectors, no testing internal helpers.
