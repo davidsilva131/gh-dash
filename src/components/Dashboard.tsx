@@ -37,6 +37,7 @@ export default function Dashboard({ initialUsername = "" }: DashboardProps) {
           <Input
             type="text"
             placeholder="Enter GitHub username..."
+            aria-label="GitHub username"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             className="flex-1"
@@ -58,6 +59,7 @@ export default function Dashboard({ initialUsername = "" }: DashboardProps) {
             <Input
               type="text"
               placeholder="GitHub username..."
+              aria-label="GitHub username"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               className="flex-1"
