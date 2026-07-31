@@ -22,6 +22,44 @@ describe("ActivityTab", () => {
     expect(screen.getByText("Create")).toBeInTheDocument();
     expect(screen.getByText("Fork")).toBeInTheDocument();
   });
+
+  it("renders a loading placeholder when isLoading is true", () => {
+    render(<ActivityTab username={SAMPLE_USER} isLoading />);
+    expect(screen.getByTestId("activity-loading")).toBeInTheDocument();
+  });
+
+  it("renders an error message when an error is provided", () => {
+    render(
+      <ActivityTab
+        username={SAMPLE_USER}
+        error={{ type: "network", message: "Could not reach GitHub" }}
+      />
+    );
+    expect(screen.getByTestId("activity-error")).toBeInTheDocument();
+    expect(screen.getByText("Could not reach GitHub")).toBeInTheDocument();
+  });
+
+  it("renders events from the data prop when provided", () => {
+    render(
+      <ActivityTab
+        username="testuser"
+        data={{
+          profile: { login: "testuser", name: null, avatarUrl: "", bio: null, company: null, location: null, blog: "", followers: 0, following: 0 },
+          stats: { publicRepos: 1, totalStars: 0 },
+          languages: [],
+          contributions: [],
+          repos: [],
+          activity: [
+            { id: "1", type: "PushEvent", title: "Pushed to main", repoName: "test/repo", repoUrl: "https://github.com/test/repo", createdAt: "2024-01-01T00:00:00Z" },
+            { id: "2", type: "WatchEvent", title: "Starred the repo", repoName: "test/repo", repoUrl: "https://github.com/test/repo", createdAt: "2024-01-02T00:00:00Z" },
+          ],
+        }}
+      />
+    );
+    expect(screen.getByText("Pushed to main")).toBeInTheDocument();
+    expect(screen.getByText("Starred the repo")).toBeInTheDocument();
+  });
+
 });
 
 describe("ActivityEvent", () => {

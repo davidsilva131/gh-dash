@@ -39,6 +39,45 @@ describe("ReposTab", () => {
       screen.getByRole("button", { name: "Most Stars", pressed: false })
     ).toBeInTheDocument();
   });
+
+  it("renders a loading placeholder when isLoading is true", () => {
+    render(<ReposTab username={SAMPLE_USER} isLoading />);
+    expect(screen.getByTestId("repos-loading")).toBeInTheDocument();
+  });
+
+  it("renders an error message when an error is provided", () => {
+    render(
+      <ReposTab
+        username={SAMPLE_USER}
+        error={{ type: "rate_limited", message: "Rate limit exceeded" }}
+      />
+    );
+    expect(screen.getByTestId("repos-error")).toBeInTheDocument();
+    expect(screen.getByText("Rate limit exceeded")).toBeInTheDocument();
+  });
+
+  it("renders repos from the data prop when provided", () => {
+    render(
+      <ReposTab
+        username="testuser"
+        data={{
+          profile: { login: "testuser", name: null, avatarUrl: "", bio: null, company: null, location: null, blog: "", followers: 0, following: 0 },
+          stats: { publicRepos: 2, totalStars: 0 },
+          languages: [],
+          contributions: [],
+          repos: [
+            { name: "repo-a", description: "First repo", language: "TypeScript", languageColor: "#3178c6", stars: 5, forks: 1, updatedAt: "2024-01-01", url: "https://github.com/test/repo-a" },
+            { name: "repo-b", description: "Second repo", language: "Rust", languageColor: "#dea584", stars: 12, forks: 0, updatedAt: "2024-01-02", url: "https://github.com/test/repo-b" },
+          ],
+          activity: [],
+        }}
+      />
+    );
+    expect(screen.getByText("2 repositories")).toBeInTheDocument();
+    expect(screen.getByText("repo-a")).toBeInTheDocument();
+    expect(screen.getByText("repo-b")).toBeInTheDocument();
+  });
+
 });
 
 describe("RepoCard", () => {

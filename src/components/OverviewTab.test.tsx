@@ -39,6 +39,59 @@ describe("OverviewTab", () => {
     const cells = screen.getAllByTitle(/contributions/i);
     expect(cells).toHaveLength(VISIBLE_CONTRIBUTION_WEEKS * 7);
   });
+
+  it("renders a loading placeholder when isLoading is true", () => {
+    render(<OverviewTab username={SAMPLE_USER} isLoading />);
+    expect(screen.getByTestId("overview-loading")).toBeInTheDocument();
+  });
+
+  it("renders an error message when an error is provided", () => {
+    render(
+      <OverviewTab
+        username={SAMPLE_USER}
+        error={{ type: "not_found", message: "User not found" }}
+      />
+    );
+    expect(screen.getByTestId("overview-error")).toBeInTheDocument();
+    expect(screen.getByText("Error")).toBeInTheDocument();
+    expect(screen.getByText("User not found")).toBeInTheDocument();
+  });
+
+  it("renders data from the data prop when provided", () => {
+    render(
+      <OverviewTab
+        username="testuser"
+        data={{
+          profile: {
+            login: "testuser",
+            name: "Test User",
+            avatarUrl: "https://example.com/avatar.png",
+            bio: "A test bio",
+            company: "TestCo",
+            location: "TestLand",
+            blog: "https://test.blog",
+            followers: 10,
+            following: 5,
+          },
+          stats: { publicRepos: 3, totalStars: 20 },
+          languages: [{ name: "Rust", value: 100, color: "#dea584" }],
+          contributions: Array.from({ length: 52 }, () => ({ days: [0] })),
+          repos: [],
+          activity: [],
+        }}
+      />
+    );
+    expect(screen.getByText("Test User")).toBeInTheDocument();
+    expect(screen.getByText("@testuser")).toBeInTheDocument();
+    expect(screen.getByText("A test bio")).toBeInTheDocument();
+    expect(screen.getByText("3")).toBeInTheDocument();
+    expect(screen.getByText("20")).toBeInTheDocument();
+    expect(screen.getByText("10")).toBeInTheDocument();
+    expect(screen.getByText("5")).toBeInTheDocument();
+    expect(screen.getByText("Rust")).toBeInTheDocument();
+    expect(screen.getByText("100%")).toBeInTheDocument();
+  });
+
 });
 
 describe("StatCard", () => {

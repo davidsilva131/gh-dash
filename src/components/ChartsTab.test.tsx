@@ -18,4 +18,20 @@ describe("ChartsTab", () => {
     expect(screen.getByText("Less")).toBeInTheDocument();
     expect(screen.getByText("More")).toBeInTheDocument();
   });
+
+  it("renders a loading placeholder when isLoading is true", () => {
+    render(<ChartsTab username={SAMPLE_USER} isLoading />);
+    expect(screen.getByTestId("charts-loading")).toBeInTheDocument();
+  });
+
+  it("renders an error message when an error is provided", () => {
+    render(
+      <ChartsTab
+        username={SAMPLE_USER}
+        error={{ type: "not_found", message: "User not found" }}
+      />
+    );
+    expect(screen.getByTestId("charts-error")).toBeInTheDocument();
+    expect(screen.getByText("User not found")).toBeInTheDocument();
+  });
 });

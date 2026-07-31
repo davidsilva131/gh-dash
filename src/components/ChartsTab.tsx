@@ -5,9 +5,13 @@ import {
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SAMPLE_CHARTS_LANGUAGES as LANGUAGES, SAMPLE_STARS as STARS_PER_REPO, SAMPLE_ACTIVITY as ACTIVITY_DATA, SAMPLE_CONTRIBUTION_WEEKS as CONTRIBUTION_WEEKS } from "../test/fixtures";
+import type { GitHubUserData, ErrorState } from "../lib/types";
 
 interface ChartsTabProps {
   username: string;
+  data?: GitHubUserData;
+  isLoading?: boolean;
+  error?: ErrorState | null;
 }
 
 function getContributionColor(count: number): string {
@@ -18,7 +22,25 @@ function getContributionColor(count: number): string {
   return "#39d353";
 }
 
-export default function ChartsTab({ username }: ChartsTabProps) {
+export default function ChartsTab({ username, data, isLoading, error }: ChartsTabProps) {
+  if (isLoading) {
+    return <div className="p-8 text-center text-muted-foreground" data-testid="charts-loading">Loading charts...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="p-8 text-center" data-testid="charts-error">
+        <p className="text-destructive font-semibold">Error</p>
+        <p className="text-muted-foreground text-sm mt-1">{error.message}</p>
+      </div>
+    );
+  }
+
+  const languages = data?.languages ?? LANGUAGES;
+  const starsPerRepo = data?.repos?.map((r) => ({ name: r.name, stars: r.stars })) ?? STARS_PER_REPO;
+  const contributionWeeks = data?.contributions ?? CONTRIBUTION_WEEKS;
+  const activityData = ACTIVITY_DATA; // No direct spec equivalent yet
+
   return (
     <div className="space-y-6">
       {/* Languages Pie + Stars Bar */}
@@ -29,7 +51,7 @@ export default function ChartsTab({ username }: ChartsTabProps) {
             <ResponsiveContainer width="100%" height={280}>
               <PieChart>
                 <Pie
-                  data={LANGUAGES}
+                  data={languages}
                   cx="50%"
                   cy="50%"
                   innerRadius={60}
@@ -37,7 +59,7 @@ export default function ChartsTab({ username }: ChartsTabProps) {
                   paddingAngle={2}
                   dataKey="value"
                 >
-                  {LANGUAGES.map((entry, index) => (
+                  {languages.map((entry, index) => (
                     <Cell key={index} fill={entry.color} />
                   ))}
                 </Pie>
@@ -58,7 +80,7 @@ export default function ChartsTab({ username }: ChartsTabProps) {
           <CardHeader><CardTitle className="text-lg">Stars per Repository</CardTitle></CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={280}>
-              <BarChart data={STARS_PER_REPO}>
+              <BarChart data={starsPerRepo}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#27272a" />
                 <XAxis dataKey="name" tick={{ fill: "#a1a1aa", fontSize: 12 }} />
                 <YAxis tick={{ fill: "#a1a1aa", fontSize: 12 }} />
@@ -86,7 +108,7 @@ export default function ChartsTab({ username }: ChartsTabProps) {
         <CardContent>
           <div className="overflow-x-auto">
             <div className="flex gap-[3px] min-w-max">
-              {CONTRIBUTION_WEEKS.map((week, wi) => (
+              {contributionWeeks.map((week, wi) => (
                 <div key={wi} className="flex flex-col gap-[3px]">
                   {week.days.map((day, di) => (
                     <div
@@ -119,7 +141,7 @@ export default function ChartsTab({ username }: ChartsTabProps) {
         <CardHeader><CardTitle className="text-lg">Activity Overview</CardTitle></CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={ACTIVITY_DATA}>
+            <LineChart data={activityData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#27272a" />
               <XAxis dataKey="month" tick={{ fill: "#a1a1aa", fontSize: 12 }} />
               <YAxis tick={{ fill: "#a1a1aa", fontSize: 12 }} />
