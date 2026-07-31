@@ -9,13 +9,14 @@ const { title = "gh-dash" } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
+    <meta name="description" content="GitHub Personal Dashboard — view any GitHub user's profile, repos, contributions, and activity at a glance." />
   </head>
-  <body class="bg-background text-foreground min-h-screen">
+  <body class="bg-background text-foreground min-h-screen antialiased">
     <slot />
   </body>
 </html>
