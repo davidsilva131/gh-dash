@@ -15,17 +15,16 @@ interface OverviewTabProps {
   onRetry?: () => void;
 }
 
-// Contribution heatmap color scale (GitHub-style green ramp).
-// 0 = empty, 1..3 = increasing intensity, 4+ = maximum.
+// Contribution heatmap color scale (Terminal instrument: cyan-green ramp).
+// 0 = empty, 1..3 = increasing intensity, 4 = maximum.
 const CONTRIBUTION_LEVEL_CLASSES = [
-  "bg-border/30",
-  "bg-emerald-200",
-  "bg-emerald-400",
-  "bg-emerald-600",
-  "bg-emerald-700",
+  "bg-contrib-0",
+  "bg-contrib-1",
+  "bg-contrib-2",
+  "bg-contrib-3",
+  "bg-contrib-4",
 ];
 
-// Weeks of the contribution calendar shown in the Overview tab.
 const VISIBLE_WEEKS = 26;
 
 function getContributionLevel(count: number) {
@@ -33,10 +32,20 @@ function getContributionLevel(count: number) {
 }
 
 function countContributions(weeks: { days: number[] }[]) {
-  return weeks.reduce((sum, week) => sum + week.days.reduce((daySum, count) => daySum + count, 0), 0);
+  return weeks.reduce(
+    (sum, week) =>
+      sum + week.days.reduce((daySum, count) => daySum + count, 0),
+    0,
+  );
 }
 
-export default function OverviewTab({ username, data, isLoading, error, onRetry }: OverviewTabProps) {
+export default function OverviewTab({
+  username,
+  data,
+  isLoading,
+  error,
+  onRetry,
+}: OverviewTabProps) {
   if (error) {
     return (
       <div data-testid="overview-error">
@@ -47,24 +56,29 @@ export default function OverviewTab({ username, data, isLoading, error, onRetry 
 
   if (isLoading || !data) {
     return (
-      <div data-testid="overview-loading" role="status" aria-label="Loading profile" className="space-y-6">
-        <Skeleton className="h-32 w-full rounded-xl" />
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div
+        data-testid="overview-loading"
+        role="status"
+        aria-label="Loading profile"
+        className="space-y-6"
+      >
+        <Skeleton className="h-32 w-full rounded-md" />
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-24 w-full rounded-xl" />
+            <Skeleton key={i} className="h-24 w-full rounded-md" />
           ))}
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div className="space-y-3">
             {Array.from({ length: 5 }).map((_, i) => (
-              <Skeleton key={i} className="h-4 w-full rounded-full" />
+              <Skeleton key={i} className="h-4 w-full rounded-sm" />
             ))}
           </div>
           <div className="flex gap-1 overflow-x-auto">
             {Array.from({ length: 26 }).map((_, wi) => (
               <div key={wi} className="flex flex-col gap-1">
                 {Array.from({ length: 7 }).map((_, di) => (
-                  <Skeleton key={di} className="w-3 h-3 rounded-sm" />
+                  <Skeleton key={di} className="h-2.5 w-2.5 rounded-sm" />
                 ))}
               </div>
             ))}
@@ -75,57 +89,81 @@ export default function OverviewTab({ username, data, isLoading, error, onRetry 
   }
 
   const { profile, stats, languages } = data;
-  // GitHub returns weeks oldest-first, so the visible window is the LAST weeks.
   const visibleContributionWeeks = data.contributions.slice(-VISIBLE_WEEKS);
   const totalContributions = countContributions(visibleContributionWeeks);
 
   return (
     <div className="space-y-6">
-      <Card>
+      {/* Profile hero card */}
+      <Card className="rounded-md border border-border bg-card">
         <CardContent className="p-6">
-          <div className="flex flex-col md:flex-row items-start gap-6">
-            <Avatar className="w-24 h-24 shrink-0 border-4 border-border">
+          <div className="flex flex-col items-start gap-6 md:flex-row">
+            <Avatar className="h-24 w-24 shrink-0 ring-1 ring-primary/40">
               <AvatarImage src={profile.avatarUrl} alt={profile.login} />
-              <AvatarFallback className="text-2xl">{profile.login[0]?.toUpperCase()}</AvatarFallback>
+              <AvatarFallback className="mono text-2xl text-foreground">
+                {profile.login[0]?.toUpperCase()}
+              </AvatarFallback>
             </Avatar>
-            <div className="flex-1 min-w-0">
-              <div className="flex flex-wrap items-center gap-3 mb-2">
-                <h2 className="text-2xl font-bold">{profile.name}</h2>
-                <Badge variant="secondary">@{profile.login}</Badge>
+            <div className="min-w-0 flex-1">
+              <div className="mb-2 flex flex-wrap items-center gap-3">
+                <h2 className="text-2xl font-bold text-foreground">
+                  {profile.name}
+                </h2>
+                <Badge
+                  variant="secondary"
+                  className="mono rounded-sm border border-primary/30 bg-primary/10 px-2 py-0.5 text-xs text-primary"
+                >
+                  @{profile.login}
+                </Badge>
               </div>
-              <p className="text-muted-foreground mb-3">{profile.bio}</p>
-              <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-                {profile.company && <span>{profile.company}</span>}
-                {profile.location && <span>{profile.location}</span>}
+              <p className="mb-3 text-sm text-muted-foreground">{profile.bio}</p>
+              <div className="mono flex flex-wrap gap-3 text-xs text-muted-foreground">
+                {profile.company && (
+                  <span className="text-muted-foreground">{profile.company}</span>
+                )}
+                {profile.location && (
+                  <span className="text-muted-foreground">{profile.location}</span>
+                )}
               </div>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {/* 4 stat cards */}
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         <StatCard label="Repositories" value={stats.publicRepos} icon={<FolderGit2 />} />
         <StatCard label="Total Stars" value={stats.totalStars} icon={<Star />} />
         <StatCard label="Followers" value={profile.followers} icon={<Users />} />
         <StatCard label="Following" value={profile.following} icon={<UserPlus />} />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader><CardTitle className="text-lg">Languages</CardTitle></CardHeader>
+      {/* Languages + Contributions */}
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <Card className="rounded-md border border-border bg-card">
+          <CardHeader>
+            <CardTitle className="mono text-sm font-semibold uppercase tracking-wider text-muted-foreground before:mr-1 before:text-primary before:content-['>_']">
+              Languages
+            </CardTitle>
+          </CardHeader>
           <CardContent>
             <div className="space-y-3">
               {languages.map((lang) => (
                 <div key={lang.name} className="flex items-center gap-3">
                   <div className="flex-1">
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>{lang.name}</span>
+                    <div className="mono mb-1 flex justify-between text-xs">
+                      <span className="text-foreground before:mr-1 before:text-primary before:content-['>_']">
+                        {lang.name}
+                      </span>
                       <span className="text-muted-foreground">{lang.value}%</span>
                     </div>
-                    <div className="h-2 rounded-full bg-border overflow-hidden">
+                    <div className="h-1.5 overflow-hidden rounded-sm bg-border">
                       <div
-                        className="h-full rounded-full transition-all duration-500"
-                        style={{ width: lang.value + "%", backgroundColor: lang.color }}
+                        className="h-full rounded-sm transition-all duration-500"
+                        style={{
+                          width: lang.value + "%",
+                          backgroundColor: lang.color,
+                        }}
                       />
                     </div>
                   </div>
@@ -135,16 +173,20 @@ export default function OverviewTab({ username, data, isLoading, error, onRetry 
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader><CardTitle className="text-lg">Contributions</CardTitle></CardHeader>
+        <Card className="rounded-md border border-border bg-card">
+          <CardHeader>
+            <CardTitle className="mono text-sm font-semibold uppercase tracking-wider text-muted-foreground before:mr-1 before:text-primary before:content-['>_']">
+              Contributions
+            </CardTitle>
+          </CardHeader>
           <CardContent>
-            <div className="flex gap-1 overflow-x-auto">
+            <div className="flex gap-[2px] overflow-x-auto">
               {visibleContributionWeeks.map((week, wi) => (
-                <div key={wi} className="flex flex-col gap-1">
+                <div key={wi} className="flex flex-col gap-[2px]">
                   {week.days.map((day, di) => (
                     <div
                       key={di}
-                      className={"w-3 h-3 rounded-sm " + getContributionLevel(day)}
+                      className={`h-2.5 w-2.5 rounded-sm ${getContributionLevel(day)}`}
                       title={day + " contributions"}
                     />
                   ))}
@@ -152,13 +194,18 @@ export default function OverviewTab({ username, data, isLoading, error, onRetry 
               ))}
             </div>
             <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-              <p className="text-xs text-muted-foreground">
-                {totalContributions} {totalContributions === 1 ? "contribution" : "contributions"} in the last 6 months
+              <p className="mono text-xs text-muted-foreground before:mr-1 before:text-primary before:content-['>_']">
+                {totalContributions}{" "}
+                {totalContributions === 1 ? "contribution" : "contributions"}{" "}
+                in the last 6 months
               </p>
-              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <div className="mono flex items-center gap-1 text-[10px] text-muted-foreground">
                 <span>Less</span>
                 {CONTRIBUTION_LEVEL_CLASSES.map((levelClass) => (
-                  <span key={levelClass} className={"w-3 h-3 rounded-sm " + levelClass} />
+                  <span
+                    key={levelClass}
+                    className={`h-2.5 w-2.5 rounded-sm ${levelClass}`}
+                  />
                 ))}
                 <span>More</span>
               </div>

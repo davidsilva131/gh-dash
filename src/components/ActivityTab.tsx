@@ -11,7 +11,13 @@ interface ActivityTabProps {
   onRetry?: () => void;
 }
 
-export default function ActivityTab({ username, data, isLoading, error, onRetry }: ActivityTabProps) {
+export default function ActivityTab({
+  username,
+  data,
+  isLoading,
+  error,
+  onRetry,
+}: ActivityTabProps) {
   if (error) {
     return (
       <div data-testid="activity-error">
@@ -22,16 +28,20 @@ export default function ActivityTab({ username, data, isLoading, error, onRetry 
 
   if (isLoading || !data) {
     return (
-      <div data-testid="activity-loading" role="status" aria-label="Loading activity" className="space-y-2">
-        <Skeleton className="h-4 w-48 rounded-full mb-4" />
+      <div
+        data-testid="activity-loading"
+        role="status"
+        aria-label="Loading activity"
+        className="space-y-2"
+      >
+        <Skeleton className="mb-4 h-4 w-48 rounded-sm" />
         {Array.from({ length: 6 }).map((_, i) => (
-          <Skeleton key={i} className="h-16 w-full rounded-xl" />
+          <Skeleton key={i} className="h-16 w-full rounded-md" />
         ))}
       </div>
     );
   }
 
-  // Map spec ActivityEvent shape to the component's expected shape
   const events = data.activity.map((e) => ({
     type: e.type,
     repo: e.repoName,
@@ -41,7 +51,9 @@ export default function ActivityTab({ username, data, isLoading, error, onRetry 
 
   return (
     <div className="space-y-2">
-      <p className="text-sm text-muted-foreground mb-4">Recent activity from {username}</p>
+      <p className="mono mb-4 text-sm text-muted-foreground before:mr-1 before:text-primary before:content-['>_']">
+        Recent activity from {username}
+      </p>
       {events.map((event, i) => (
         <ActivityEvent key={i} {...(event as Parameters<typeof ActivityEvent>[0])} />
       ))}
