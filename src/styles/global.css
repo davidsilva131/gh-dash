@@ -3,6 +3,7 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
+@import "@fontsource-variable/geist-mono";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -72,6 +73,15 @@ body {
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+  --color-border-bright: var(--border-bright);
+  --color-positive: var(--positive);
+  --color-positive-foreground: var(--positive-foreground);
+  --color-contrib-0: var(--contrib-0);
+  --color-contrib-1: var(--contrib-1);
+  --color-contrib-2: var(--contrib-2);
+  --color-contrib-3: var(--contrib-3);
+  --color-contrib-4: var(--contrib-4);
+  --font-mono: 'Geist Mono Variable', 'Geist Mono', 'JetBrains Mono', ui-monospace, monospace;
 }
 
 :root {
@@ -110,47 +120,102 @@ body {
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* Terminal instrument palette */
+  --background: oklch(0.13 0.025 250);
+  --foreground: oklch(0.86 0.01 250);
+  --card: oklch(0.165 0.022 248);
+  --card-foreground: oklch(0.86 0.01 250);
+  --popover: oklch(0.165 0.022 248);
+  --popover-foreground: oklch(0.86 0.01 250);
+
+  /* Primary = cyan (interactive states only) */
+  --primary: oklch(0.83 0.16 215);
+  --primary-foreground: oklch(0.13 0.025 250);
+
+  --secondary: oklch(0.20 0.02 248);
+  --secondary-foreground: oklch(0.86 0.01 250);
+
+  --muted: oklch(0.20 0.02 248);
+  --muted-foreground: oklch(0.62 0.015 245);
+
+  /* Accent = amber (warnings) */
+  --accent: oklch(0.81 0.14 75);
+  --accent-foreground: oklch(0.13 0.025 250);
+
+  /* Destructive = magenta */
+  --destructive: oklch(0.69 0.18 15);
+  --destructive-foreground: oklch(0.98 0 0);
+
+  --border: oklch(0.27 0.025 245);
+  --border-bright: oklch(0.36 0.04 248);
+  --input: oklch(0.27 0.025 245);
+  --ring: oklch(0.83 0.16 215);
+
+  /* Charts */
+  --chart-1: oklch(0.83 0.16 215);  /* primary cyan */
+  --chart-2: oklch(0.78 0.13 165); /* positive green */
+  --chart-3: oklch(0.81 0.14 75);  /* accent amber */
+  --chart-4: oklch(0.69 0.18 15);  /* destructive magenta */
+  --chart-5: oklch(0.62 0.015 245);/* muted */
+
+  /* Contribution ramp (used directly by OverviewTab + ChartsTab) */
+  --contrib-0: oklch(0.20 0.012 248);
+  --contrib-1: oklch(0.31 0.04 165);
+  --contrib-2: oklch(0.45 0.06 165);
+  --contrib-3: oklch(0.78 0.13 165);
+  --contrib-4: oklch(0.86 0.12 165);
+
+  /* Positive (success state, not in shadcn preset) */
+  --positive: oklch(0.78 0.13 165);
+  --positive-foreground: oklch(0.13 0.025 250);
+
+  /* Sharp terminal radius */
+  --radius: 0.25rem;
+
+  --sidebar: oklch(0.165 0.022 248);
+  --sidebar-foreground: oklch(0.86 0.01 250);
+  --sidebar-primary: oklch(0.83 0.16 215);
+  --sidebar-primary-foreground: oklch(0.13 0.025 250);
+  --sidebar-accent: oklch(0.20 0.02 248);
+  --sidebar-accent-foreground: oklch(0.86 0.01 250);
+  --sidebar-border: oklch(0.27 0.025 245);
+  --sidebar-ring: oklch(0.83 0.16 215);
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-background text-foreground;
-  }
   html {
     @apply font-sans;
+    color-scheme: dark;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-variant-numeric: tabular-nums;
+  }
+  /* Body texture: faint scanlines + grid (terminal instrument signature) */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background:
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        color-mix(in oklch, var(--primary) 1.5%, transparent) 2px,
+        color-mix(in oklch, var(--primary) 1.5%, transparent) 4px
+      ),
+      linear-gradient(color-mix(in oklch, var(--primary) 4%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in oklch, var(--primary) 4%, transparent) 1px, transparent 1px);
+    background-size: 100% 100%, 40px 40px, 40px 40px;
+  }
+  /* Mono utility for numbers/usernames */
+  .mono {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
   }
 }
