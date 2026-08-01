@@ -71,15 +71,15 @@ describe("ActivityEvent", () => {
   });
 
   it.each([
-    ["PushEvent", "Push", "P"],
-    ["PullRequestEvent", "PR", "R"],
-    ["IssuesEvent", "Issue", "I"],
-    ["WatchEvent", "Star", "S"],
-    ["CreateEvent", "Create", "C"],
-    ["ForkEvent", "Fork", "F"],
+    ["PushEvent", "Push", "Push event icon"],
+    ["PullRequestEvent", "PR", "Pull request event icon"],
+    ["IssuesEvent", "Issue", "Issue event icon"],
+    ["WatchEvent", "Star", "Watch event icon"],
+    ["CreateEvent", "Create", "Create event icon"],
+    ["ForkEvent", "Fork", "Fork event icon"],
   ] as const)(
     "renders the %s event with icon, badge label, title, repo, and time",
-    (type, label, icon) => {
+    (type, label, iconAriaLabel) => {
       vi.useFakeTimers();
       vi.setSystemTime(new Date("2024-06-01T12:00:00Z"));
       render(
@@ -90,7 +90,7 @@ describe("ActivityEvent", () => {
           time="2024-06-01T11:00:00Z"
         />
       );
-      expect(screen.getByText(icon)).toBeInTheDocument();
+      expect(screen.getByLabelText(iconAriaLabel)).toBeInTheDocument();
       expect(screen.getByText(label)).toBeInTheDocument();
       expect(screen.getByText("Some activity")).toBeInTheDocument();
       expect(screen.getByText("owner/repo")).toBeInTheDocument();

@@ -1,7 +1,7 @@
-import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { FolderGit2, Star, Users, UserPlus } from "lucide-react";
 import StatCard from "./StatCard";
 import ErrorDisplay from "./ErrorDisplay";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -104,10 +104,10 @@ export default function OverviewTab({ username, data, isLoading, error, onRetry 
       </Card>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard label="Repositories" value={stats.publicRepos} icon="" />
-        <StatCard label="Total Stars" value={stats.totalStars} icon="" />
-        <StatCard label="Followers" value={profile.followers} icon="" />
-        <StatCard label="Following" value={profile.following} icon="" />
+        <StatCard label="Repositories" value={stats.publicRepos} icon={<FolderGit2 />} />
+        <StatCard label="Total Stars" value={stats.totalStars} icon={<Star />} />
+        <StatCard label="Followers" value={profile.followers} icon={<Users />} />
+        <StatCard label="Following" value={profile.following} icon={<UserPlus />} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

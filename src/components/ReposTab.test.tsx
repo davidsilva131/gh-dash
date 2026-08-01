@@ -135,8 +135,8 @@ describe("RepoCard", () => {
     expect(screen.getByText("gh-dash")).toBeInTheDocument();
     expect(screen.getByText("GitHub dashboard")).toBeInTheDocument();
     expect(screen.getByText("TypeScript")).toBeInTheDocument();
-    expect(screen.getByText("★ 5")).toBeInTheDocument();
-    expect(screen.getByText("★ 1")).toBeInTheDocument();
+    expect(screen.getByLabelText("5 stars")).toBeInTheDocument();
+    expect(screen.getByLabelText("1 forks")).toBeInTheDocument();
     expect(screen.getByText("2 days ago")).toBeInTheDocument();
     const dot = container.querySelector("[style*='background-color']");
     expect(dot).not.toBeNull();
