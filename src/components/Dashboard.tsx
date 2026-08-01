@@ -18,6 +18,64 @@ interface ApiErrorBody {
   error?: { type?: ErrorState["type"]; message?: string; retryAfter?: string };
 }
 
+// Terminal-style wordmark: ">" in cyan + "gh-dash" in fg
+function Wordmark({ size = "lg" }: { size?: "sm" | "lg" }) {
+  const cls =
+    size === "lg"
+      ? "text-4xl font-bold"
+      : "text-base font-semibold";
+  return (
+    <h1
+      className={`mono ${cls} leading-none tracking-tight`}
+    >
+      <span className="text-primary">{">"}</span>
+      <span className="text-foreground"> gh-dash</span>
+    </h1>
+  );
+}
+
+// Terminal-style search input with "$" prefix
+function SearchInput({
+  value,
+  onChange,
+  placeholder,
+  size = "sm",
+  autoFocus = false,
+  invalid = false,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  placeholder: string;
+  size?: "sm" | "md";
+  autoFocus?: boolean;
+  invalid?: boolean;
+}) {
+  const inputCls =
+    size === "md"
+      ? "h-12 text-base pl-9 pr-4"
+      : "h-9 text-sm pl-7 pr-3";
+  return (
+    <div className="relative w-full">
+      <span
+        aria-hidden="true"
+        className="mono text-primary absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none select-none"
+      >
+        $
+      </span>
+      <Input
+        type="text"
+        aria-label="GitHub username"
+        placeholder={placeholder}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        autoFocus={autoFocus}
+        aria-invalid={invalid ? true : undefined}
+        className={`mono border-border bg-card text-foreground placeholder:text-muted-foreground/60 focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary focus-visible:shadow-[0_0_16px_-4px_var(--primary)] [caret-color:var(--primary)] ${inputCls}`}
+      />
+    </div>
+  );
+}
+
 export default function Dashboard({ initialUsername = "" }: DashboardProps) {
   const [username, setUsername] = useState(initialUsername);
   const [searchInput, setSearchInput] = useState(initialUsername);
@@ -82,86 +140,135 @@ export default function Dashboard({ initialUsername = "" }: DashboardProps) {
     setRetryKey((k) => k + 1);
   };
 
-  // Until a fetch has produced data or an error, treat the UI as loading
-  // (covers the render between submit and the effect running).
   const showLoading = isLoading || (!data && !error);
   const tabProps = { username, data, isLoading: showLoading, error, onRetry: handleRetry };
 
   if (!username) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6">
-        <div className="text-center space-y-3">
-          <h1 className="text-4xl font-bold text-primary">gh-dash</h1>
-          <p className="text-lg text-muted-foreground">GitHub Personal Dashboard</p>
-          <p className="text-sm text-muted-foreground max-w-md">
-            Enter a GitHub username to view their profile, repositories, contribution history, and more.
+      <div className="relative z-10 flex min-h-[70vh] flex-col items-center justify-center gap-8 px-4">
+        <div className="w-full max-w-xl space-y-4 text-center">
+          <Wordmark size="lg" />
+          <p className="mono text-sm text-muted-foreground">
+            // GitHub Personal Dashboard
+          </p>
+          <p className="text-sm text-muted-foreground/80">
+            view profile · repos · contributions · activity
           </p>
         </div>
-        <form onSubmit={handleSearch} className="flex gap-2 w-full max-w-md" noValidate>
-          <Input
-            type="text"
-            placeholder="Enter GitHub username..."
-            aria-label="GitHub username"
+        <form
+          onSubmit={handleSearch}
+          className="flex w-full max-w-xl gap-2"
+          noValidate
+        >
+          <SearchInput
             value={searchInput}
-            onChange={(e) => {
-              setSearchInput(e.target.value);
+            onChange={(v) => {
+              setSearchInput(v);
               if (validationError) setValidationError(null);
             }}
-            className="flex-1"
+            placeholder="davidsilva131"
+            size="md"
             autoFocus
-            aria-invalid={validationError ? true : undefined}
+            invalid={!!validationError}
           />
-          <Button type="submit">View</Button>
+          <Button
+            type="submit"
+            className="mono h-12 border border-primary bg-transparent px-5 text-sm font-semibold uppercase tracking-wider text-primary hover:bg-primary/10 hover:shadow-[0_0_16px_-4px_var(--primary)]"
+          >
+            View <span aria-hidden="true">-&gt;</span>
+          </Button>
         </form>
         {validationError && (
-          <p role="alert" className="text-sm text-destructive">
+          <p role="alert" className="mono text-xs text-destructive">
+            <span className="text-accent">! </span>
             {validationError}
           </p>
         )}
+        <p className="mono text-xs text-muted-foreground/70">
+          {"> "}
+          <a
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              setSearchInput("davidsilva131");
+              setUsername("davidsilva131");
+              setValidationError(null);
+            }}
+            className="text-primary hover:underline"
+          >
+            try: davidsilva131
+          </a>
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header with Search + Tabs */}
-      <header className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border pb-4 -mx-4 px-4 pt-2 space-y-4">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-primary shrink-0">gh-dash</h1>
-          <form onSubmit={handleSearch} className="flex gap-2 max-w-sm flex-1 ml-6" noValidate>
-            <Input
-              type="text"
-              placeholder="GitHub username..."
-              aria-label="GitHub username"
+    <div className="relative z-10 space-y-6">
+      <header className="sticky top-0 z-20 -mx-4 border-b border-border bg-background/85 px-4 py-3 backdrop-blur-sm">
+        <div className="flex items-center gap-6">
+          <a href="/" className="shrink-0">
+            <Wordmark size="sm" />
+          </a>
+          <form
+            onSubmit={handleSearch}
+            className="flex max-w-md flex-1 gap-2"
+            noValidate
+          >
+            <SearchInput
               value={searchInput}
-              onChange={(e) => {
-                setSearchInput(e.target.value);
+              onChange={(v) => {
+                setSearchInput(v);
                 if (validationError) setValidationError(null);
               }}
-              className="flex-1"
-              aria-invalid={validationError ? true : undefined}
+              placeholder="search handle..."
+              invalid={!!validationError}
             />
-            <Button type="submit" size="sm">
+            <Button
+              type="submit"
+              size="sm"
+              className="mono border border-primary bg-transparent px-3 text-xs font-semibold uppercase tracking-wider text-primary hover:bg-primary/10 hover:shadow-[0_0_16px_-4px_var(--primary)]"
+            >
               Search
             </Button>
           </form>
         </div>
         {validationError && (
-          <p role="alert" className="text-sm text-destructive">
+          <p role="alert" className="mono mt-2 text-xs text-destructive">
+            <span className="text-accent">! </span>
             {validationError}
           </p>
         )}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="w-full justify-start">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="repos">Repos</TabsTrigger>
-            <TabsTrigger value="activity">Activity</TabsTrigger>
-            <TabsTrigger value="charts">Charts</TabsTrigger>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-3 w-full">
+          <TabsList className="mono flex h-auto w-full justify-start gap-0 rounded-none border-0 bg-transparent p-0">
+            <TabsTrigger
+              value="overview"
+              className="mono relative rounded-none border-0 bg-transparent px-4 py-2 text-xs font-medium uppercase tracking-wider text-muted-foreground shadow-none data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none hover:text-foreground before:mr-1.5 before:text-primary/40 before:content-['>_'] data-[state=active]:before:text-primary data-[state=active]:after:absolute data-[state=active]:after:bottom-[-13px] data-[state=active]:after:left-3 data-[state=active]:after:right-3 data-[state=active]:after:h-px data-[state=active]:after:bg-primary data-[state=active]:after:shadow-[0_0_8px_var(--primary)] data-[state=active]:after:content-['']"
+            >
+              Overview
+            </TabsTrigger>
+            <TabsTrigger
+              value="repos"
+              className="mono relative rounded-none border-0 bg-transparent px-4 py-2 text-xs font-medium uppercase tracking-wider text-muted-foreground shadow-none data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none hover:text-foreground before:mr-1.5 before:text-primary/40 before:content-['>_'] data-[state=active]:before:text-primary data-[state=active]:after:absolute data-[state=active]:after:bottom-[-13px] data-[state=active]:after:left-3 data-[state=active]:after:right-3 data-[state=active]:after:h-px data-[state=active]:after:bg-primary data-[state=active]:after:shadow-[0_0_8px_var(--primary)] data-[state=active]:after:content-['']"
+            >
+              Repos
+            </TabsTrigger>
+            <TabsTrigger
+              value="activity"
+              className="mono relative rounded-none border-0 bg-transparent px-4 py-2 text-xs font-medium uppercase tracking-wider text-muted-foreground shadow-none data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none hover:text-foreground before:mr-1.5 before:text-primary/40 before:content-['>_'] data-[state=active]:before:text-primary data-[state=active]:after:absolute data-[state=active]:after:bottom-[-13px] data-[state=active]:after:left-3 data-[state=active]:after:right-3 data-[state=active]:after:h-px data-[state=active]:after:bg-primary data-[state=active]:after:shadow-[0_0_8px_var(--primary)] data-[state=active]:after:content-['']"
+            >
+              Activity
+            </TabsTrigger>
+            <TabsTrigger
+              value="charts"
+              className="mono relative rounded-none border-0 bg-transparent px-4 py-2 text-xs font-medium uppercase tracking-wider text-muted-foreground shadow-none data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none hover:text-foreground before:mr-1.5 before:text-primary/40 before:content-['>_'] data-[state=active]:before:text-primary data-[state=active]:after:absolute data-[state=active]:after:bottom-[-13px] data-[state=active]:after:left-3 data-[state=active]:after:right-3 data-[state=active]:after:h-px data-[state=active]:after:bg-primary data-[state=active]:after:shadow-[0_0_8px_var(--primary)] data-[state=active]:after:content-['']"
+            >
+              Charts
+            </TabsTrigger>
           </TabsList>
         </Tabs>
       </header>
 
-      {/* Tab Content */}
       <div className="min-h-[60vh]">
         {activeTab === "overview" && <OverviewTab {...tabProps} />}
         {activeTab === "repos" && <ReposTab {...tabProps} />}
@@ -169,9 +276,19 @@ export default function Dashboard({ initialUsername = "" }: DashboardProps) {
         {activeTab === "charts" && <ChartsTab {...tabProps} />}
       </div>
 
-      {/* Footer */}
-      <footer className="text-center text-xs text-muted-foreground border-t border-border pt-6 mt-12">
-        <p>Built with Astro 7 + React 19 + Tailwind v4 + shadcn/ui + Recharts</p>
+      <footer className="mono mt-12 border-t border-border pt-6 text-center text-[11px] text-muted-foreground/70">
+        <p>
+          {"> "}built with:{" "}
+          <span className="text-primary">astro</span>
+          {" · "}
+          <span className="text-primary">react</span>
+          {" · "}
+          <span className="text-primary">tailwind</span>
+          {" · "}
+          <span className="text-primary">shadcn/ui</span>
+          {" · "}
+          <span className="text-primary">recharts</span>
+        </p>
       </footer>
     </div>
   );
