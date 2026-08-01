@@ -41,6 +41,13 @@ describe("OverviewTab", () => {
     expect(cells).toHaveLength(VISIBLE_CONTRIBUTION_WEEKS * 7);
   });
 
+  it("shows the total contributions for the visible window and the heatmap legend", () => {
+    render(<OverviewTab username={SAMPLE_USER} data={SAMPLE_USER_DATA} />);
+    expect(screen.getByText("416 contributions in the last 6 months")).toBeInTheDocument();
+    expect(screen.getByText("Less")).toBeInTheDocument();
+    expect(screen.getByText("More")).toBeInTheDocument();
+  });
+
   it("renders skeletons when isLoading is true", () => {
     const { container } = render(<OverviewTab username={SAMPLE_USER} data={SAMPLE_USER_DATA} isLoading />);
     expect(screen.getByTestId("overview-loading")).toBeInTheDocument();

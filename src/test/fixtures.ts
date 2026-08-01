@@ -190,7 +190,7 @@ export const SAMPLE_ACTIVITY = [
 export const SAMPLE_CONTRIBUTION_WEEKS: { days: number[] }[] = Array.from(
   { length: 52 },
   () => ({
-    days: Array.from({ length: 7 }, () => Math.floor(Math.random() * 5)),
+    days: [1, 2, 3, 4, 5, 0, 1],
   }),
 );
 

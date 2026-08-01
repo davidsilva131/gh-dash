@@ -197,6 +197,37 @@ describe("fetchGitHubUser", () => {
     });
   });
 
+  it("surfaces GitHub's real message for unclassified GraphQL errors", async () => {
+    mockFetch(
+      {
+        errors: [
+          {
+            message:
+              "Argument 'ownerAffiliations' on Field 'repositories' has an invalid value ([PUBLIC]). Expected type '[RepositoryAffiliation]'.",
+          },
+        ],
+      },
+      [],
+    );
+
+    const error = await fetchGitHubUser("octocat", "test-token").catch((e) => e);
+    expect(error).toBeInstanceOf(GitHubApiError);
+    expect(error.type).toBe("network");
+    expect(error.message).toContain("ownerAffiliations");
+    expect(error.message).not.toBe("User not found");
+  });
+
+  it("queries public repos where the user is the owner", async () => {
+    const fetchMock = mockFetch(graphQLUserBody(), eventsBody());
+
+    await fetchGitHubUser("octocat", "test-token");
+
+    const gqlCall = fetchMock.mock.calls[0];
+    const body = JSON.parse(String(gqlCall[1].body)) as { query: string };
+    expect(body.query).toContain("ownerAffiliations: [OWNER]");
+    expect(body.query).toContain("privacy: PUBLIC");
+  });
+
   it("maps 403 with exhausted rate limit to a rate_limited error with retryAfter", async () => {
     const reset = String(Math.floor(Date.now() / 1000) + 3600);
     mockFetch({}, [], {

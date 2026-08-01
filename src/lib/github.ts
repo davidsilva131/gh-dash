@@ -53,7 +53,7 @@ query($username: String!) {
     websiteUrl
     followers { totalCount }
     following { totalCount }
-    repositories(first: 30, ownerAffiliations: PUBLIC, orderBy: {field: STARGAZERS, direction: DESC}) {
+    repositories(first: 30, ownerAffiliations: [OWNER], privacy: PUBLIC, orderBy: {field: STARGAZERS, direction: DESC}) {
       totalCount
       nodes {
         name
@@ -169,6 +169,12 @@ async function fetchGraphQL(username: string, token: string, signal?: AbortSigna
   if (body.errors && body.errors.length > 0) {
     const classified = classifyGraphQLErrors(body.errors);
     if (classified) throw classified;
+    // Unclassified GraphQL error (e.g. invalid query) — surface GitHub's real
+    // message instead of misreporting the user as not found.
+    throw new GitHubApiError(
+      "network",
+      body.errors[0]?.message ?? "GitHub GraphQL API error",
+    );
   }
   if (!body.data?.user) {
     throw new GitHubApiError("not_found", "User not found");

@@ -18,6 +18,8 @@
 - [#4 Chart library](https://github.com/davidsilva131/gh-dash/issues/4) — Recharts with shadcn/ui chart wrapper
 - [#6 Stack scaffold](https://github.com/davidsilva131/gh-dash/issues/6) — Validated Astro+React+Tailwind+shadcn/ui+Node adapter
 - [#5 Dashboard layout](https://github.com/davidsilva131/gh-dash/issues/5) — 4-tab Vercel Analytics style. Commit 44362ca. Build verified.
+- [#9 Testing setup](https://github.com/davidsilva131/gh-dash/issues/9) — Vitest + React Testing Library, no Playwright for now. 29 tests covering the Dashboard shell, the four tabs, and presentational cards (tickets #10–#15).
+- [#16 GitHub API integration](https://github.com/davidsilva131/gh-dash/issues/16) — full data layer implemented (tickets #17–#22, commits 0ae0f0a to 470cb53): GraphQL+REST service with in-memory TTL cache, `/api/github/[username].json` endpoint, skeletons + error UI, Dashboard orchestration with abort/validation. 66 tests green. `pnpm test` and `pnpm build` green.
 
 ## Frontier (open, unblocked, unclaimed)
 
@@ -25,13 +27,10 @@
 
 ## Not yet specified
 
-- GitHub API data integration (GraphQL query + REST events endpoint)
-- Error/loading/skeleton states for each section
 - Accessibility and keyboard navigation
-- Testing setup (Vitest? Playwright?)
 - CI/CD pipeline
 - Custom domain
-- Real-time search / username validation
+- Real-time search / debounced suggestions
 
 ## Out of scope
 

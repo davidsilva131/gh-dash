@@ -15,12 +15,25 @@ interface OverviewTabProps {
   onRetry?: () => void;
 }
 
+// Contribution heatmap color scale (GitHub-style green ramp).
+// 0 = empty, 1..3 = increasing intensity, 4+ = maximum.
+const CONTRIBUTION_LEVEL_CLASSES = [
+  "bg-border/30",
+  "bg-emerald-200",
+  "bg-emerald-400",
+  "bg-emerald-600",
+  "bg-emerald-700",
+];
+
+// Weeks of the contribution calendar shown in the Overview tab.
+const VISIBLE_WEEKS = 26;
+
 function getContributionLevel(count: number) {
-  if (count === 0) return "bg-border/30";
-  if (count === 1) return "bg-accent/30";
-  if (count === 2) return "bg-accent/50";
-  if (count === 3) return "bg-accent/70";
-  return "bg-accent";
+  return CONTRIBUTION_LEVEL_CLASSES[Math.min(count, CONTRIBUTION_LEVEL_CLASSES.length - 1)];
+}
+
+function countContributions(weeks: { days: number[] }[]) {
+  return weeks.reduce((sum, week) => sum + week.days.reduce((daySum, count) => daySum + count, 0), 0);
 }
 
 export default function OverviewTab({ username, data, isLoading, error, onRetry }: OverviewTabProps) {
@@ -62,7 +75,9 @@ export default function OverviewTab({ username, data, isLoading, error, onRetry 
   }
 
   const { profile, stats, languages } = data;
-  const contributionWeeks = data.contributions;
+  // GitHub returns weeks oldest-first, so the visible window is the LAST weeks.
+  const visibleContributionWeeks = data.contributions.slice(-VISIBLE_WEEKS);
+  const totalContributions = countContributions(visibleContributionWeeks);
 
   return (
     <div className="space-y-6">
@@ -124,7 +139,7 @@ export default function OverviewTab({ username, data, isLoading, error, onRetry 
           <CardHeader><CardTitle className="text-lg">Contributions</CardTitle></CardHeader>
           <CardContent>
             <div className="flex gap-1 overflow-x-auto">
-              {contributionWeeks.slice(0, 26).map((week, wi) => (
+              {visibleContributionWeeks.map((week, wi) => (
                 <div key={wi} className="flex flex-col gap-1">
                   {week.days.map((day, di) => (
                     <div
@@ -136,9 +151,18 @@ export default function OverviewTab({ username, data, isLoading, error, onRetry 
                 </div>
               ))}
             </div>
-            <p className="text-xs text-muted-foreground mt-3 text-center">
-              186 contributions in the last year
-            </p>
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+              <p className="text-xs text-muted-foreground">
+                {totalContributions} {totalContributions === 1 ? "contribution" : "contributions"} in the last 6 months
+              </p>
+              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <span>Less</span>
+                {CONTRIBUTION_LEVEL_CLASSES.map((levelClass) => (
+                  <span key={levelClass} className={"w-3 h-3 rounded-sm " + levelClass} />
+                ))}
+                <span>More</span>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
