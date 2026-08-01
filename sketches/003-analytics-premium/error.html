@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>User not found · gh-dash</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#09090b; --bg-elev:#111114; --bg-elev-2:#18181c;
+    --border:#1f1f25; --border-hover:#2a2a35;
+    --fg:#fafafa; --fg-muted:#a1a1aa; --fg-subtle:#71717a;
+    --brand-1:#818cf8; --brand-2:#a78bfa;
+    --brand-gradient:linear-gradient(135deg,#818cf8 0%,#a78bfa 100%);
+    --radius:16px;
+    --font-sans:'Geist',-apple-system,BlinkMacSystemFont,sans-serif;
+    --font-mono:'Geist Mono','JetBrains Mono',ui-monospace,monospace;
+    --shadow-soft:0 1px 2px rgba(0,0,0,0.3),0 0 0 1px var(--border);
+    --shadow-glow:0 8px 32px -8px rgba(129,140,248,0.25);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--fg);font-family:var(--font-sans);-webkit-font-smoothing:antialiased;font-feature-settings:"cv11","ss01","ss03","tnum";min-height:100vh}
+  body{position:relative;display:flex;flex-direction:column}
+  body::before{
+    content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:
+      radial-gradient(circle at 50% 30%, rgba(129,140,248,0.10) 0%, transparent 50%),
+      radial-gradient(circle at 50% 80%, rgba(167,139,250,0.06) 0%, transparent 50%);
+    filter:blur(60px);
+  }
+  .container{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:0 24px;width:100%}
+  @media(min-width:768px){.container{padding:0 32px}}
+  .header{position:sticky;top:0;z-index:10;backdrop-filter:blur(12px) saturate(180%);-webkit-backdrop-filter:blur(12px) saturate(180%);background:rgba(9,9,11,0.7);border-bottom:1px solid var(--border)}
+  .header-inner{display:flex;align-items:center;gap:24px;padding:14px 0}
+  .wordmark{font-size:18px;font-weight:700;letter-spacing:-0.02em;background:var(--brand-gradient);-webkit-background-clip:text;background-clip:text;color:transparent;display:inline-flex;align-items:center;gap:8px;text-decoration:none;flex-shrink:0}
+  .wordmark .dot{width:7px;height:7px;border-radius:50%;background:var(--brand-1);box-shadow:0 0 10px var(--brand-1)}
+  .search{flex:1;max-width:480px;position:relative}
+  .search input{width:100%;background:rgba(24,24,28,0.7);border:1px solid var(--border);border-radius:12px;padding:9px 12px 9px 36px;color:var(--fg);font:500 13px/1 var(--font-sans);outline:0;transition:all 200ms}
+  .search input::placeholder{color:var(--fg-subtle)}
+  .search input:focus{border-color:var(--brand-1);box-shadow:0 0 0 3px rgba(129,140,248,0.15);background:rgba(24,24,28,0.95)}
+  .search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--fg-subtle)}
+  .search kbd{position:absolute;right:10px;top:50%;transform:translateY(-50%);font:500 10px/1 var(--font-mono);color:var(--fg-subtle);border:1px solid var(--border);background:rgba(255,255,255,0.03);padding:3px 6px;border-radius:5px}
+  .tabs{display:flex;gap:4px;margin-left:8px}
+  .tab{position:relative;padding:9px 14px;font-size:13px;font-weight:500;color:var(--fg-muted);text-decoration:none;border-radius:8px;transition:color 200ms}
+  .tab:hover{color:var(--fg)}
+  .tab.active{color:var(--fg)}
+  .tab.active::after{content:"";position:absolute;left:14px;right:14px;bottom:-1px;height:2px;background:var(--brand-gradient);border-radius:2px}
+  .header-spacer{flex:1}
+  .center{flex:1;display:flex;align-items:center;justify-content:center;padding:60px 24px}
+  .err{
+    max-width:440px;width:100%;text-align:center;
+    padding:40px;border-radius:var(--radius);
+    background:var(--bg-elev);border:1px solid var(--border);
+    box-shadow:var(--shadow-soft);position:relative;overflow:hidden;
+  }
+  .err::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:radial-gradient(circle at 50% 0%, rgba(129,140,248,0.10) 0%, transparent 60%)}
+  .err > *{position:relative;z-index:1}
+  .err-icon{
+    width:64px;height:64px;border-radius:20px;margin:0 auto 24px;
+    background:rgba(129,140,248,0.10);
+    border:1px solid rgba(129,140,248,0.2);
+    color:var(--brand-2);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .err h2{margin:0 0 10px;font-size:22px;font-weight:700;letter-spacing:-0.02em}
+  .err p{margin:0 0 24px;font-size:14px;line-height:1.55;color:var(--fg-muted)}
+  .err .query{font:500 13px/1 var(--font-mono);color:var(--brand-2);background:rgba(129,140,248,0.10);padding:4px 10px;border-radius:6px;border:1px solid rgba(129,140,248,0.2)}
+  .err .actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+  .btn-primary{border:0;cursor:pointer;background:var(--brand-gradient);color:#fff;font:600 13px/1 var(--font-sans);padding:11px 22px;border-radius:10px;display:inline-flex;align-items:center;gap:6px;box-shadow:0 8px 24px -8px rgba(129,140,248,0.5);transition:transform 200ms}
+  .btn-primary:hover{transform:translateY(-1px)}
+  .btn-ghost{border:1px solid var(--border);background:rgba(255,255,255,0.02);color:var(--fg);font:500 13px/1 var(--font-sans);padding:11px 18px;border-radius:10px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:all 200ms}
+  .btn-ghost:hover{background:rgba(255,255,255,0.04);border-color:var(--border-hover)}
+  .err-hint{font-size:12px;color:var(--fg-subtle);margin-top:18px;line-height:1.5}
+  .err-hint code{font:500 11px/1 var(--font-mono);color:var(--fg-muted);background:rgba(255,255,255,0.04);padding:2px 6px;border-radius:4px}
+  .footer{margin-top:48px;padding:24px 0;border-top:1px solid var(--border);text-align:center;color:var(--fg-subtle);font-size:12px;font-family:var(--font-mono)}
+  .footer span{color:var(--fg-muted)}
+</style>
+</head>
+<body>
+  <header class="header">
+    <div class="container header-inner">
+      <a href="./landing.html" class="wordmark"><span class="dot"></span>gh-dash</a>
+      <form class="search" onsubmit="event.preventDefault();window.location.href='./overview.html'">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input type="text" placeholder="Search profiles, repos…" value="ghost-user-404" />
+        <kbd>⌘K</kbd>
+      </form>
+      <nav class="tabs">
+        <a class="tab" href="./overview.html">Overview</a>
+        <a class="tab" href="./repos.html">Repos</a>
+        <a class="tab" href="./activity.html">Activity</a>
+        <a class="tab" href="./charts.html">Charts</a>
+      </nav>
+      <div class="header-spacer"></div>
+    </div>
+  </header>
+
+  <div class="center">
+    <div class="err">
+      <div class="err-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      </div>
+      <h2>User not found</h2>
+      <p>We couldn't find <span class="query">ghost-user-404</span> on GitHub. The account may not exist, may be private, or GitHub returned an unexpected response.</p>
+      <div class="actions">
+        <button class="btn-primary" onclick="document.querySelector('.search input').focus()">Try again</button>
+        <a class="btn-ghost" href="./landing.html">Back to search</a>
+      </div>
+      <div class="err-hint">Tip · check spelling, or try one of the demos: <code>davidsilva131</code> · <code>torvalds</code> · <code>gaearon</code></div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="container">Built with <span>Astro 7</span> · <span>React 19</span> · <span>Tailwind v4</span> · <span>shadcn/ui</span> · <span>Recharts</span></div>
+  </div>
+</body>
+</html>

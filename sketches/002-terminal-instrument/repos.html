@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>> gh-dash — repos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css" />
+<style>
+  .content { padding: 28px 0 48px; }
+
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 12px 16px;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-family: var(--font-mono);
+    font-size: 12px;
+  }
+  .toolbar .count { color: var(--fg-muted); }
+  .toolbar .count .n { color: var(--cyan); font-weight: 600; }
+
+  .segmented {
+    display: inline-flex;
+    border: 1px solid var(--border-bright);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--bg-elev-2);
+  }
+  .segmented button {
+    background: transparent;
+    border: none;
+    color: var(--fg-muted);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 8px 14px;
+    cursor: pointer;
+    transition: all 200ms ease;
+    border-right: 1px solid var(--border);
+  }
+  .segmented button:last-child { border-right: none; }
+  .segmented button:hover { color: var(--fg); }
+  .segmented button.active {
+    background: rgba(0, 217, 255, 0.12);
+    color: var(--cyan);
+    box-shadow: inset 0 0 12px -6px var(--cyan);
+  }
+
+  .repo-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .repo-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    cursor: pointer;
+  }
+  .repo-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .repo-icon { color: var(--fg-muted); flex-shrink: 0; }
+  .repo-card:hover .repo-icon { color: var(--cyan); }
+  .repo-name {
+    font-family: var(--font-mono);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--fg);
+    text-decoration: none;
+    transition: color 200ms ease;
+    word-break: break-all;
+  }
+  .repo-card:hover .repo-name {
+    color: var(--cyan);
+    text-decoration: none;
+  }
+  .repo-visibility {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--fg-subtle);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 2px 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-left: auto;
+  }
+  .repo-desc {
+    font-size: 13px;
+    color: var(--fg-muted);
+    line-height: 1.55;
+    flex: 1;
+  }
+  .repo-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-size: 11px;
+    color: var(--fg-muted);
+    padding-top: 8px;
+    border-top: 1px solid var(--border);
+  }
+  .meta-item { display: inline-flex; align-items: center; gap: 5px; }
+  .meta-item svg { color: var(--fg-subtle); }
+  .meta-time { color: var(--fg-subtle); margin-left: auto; }
+  .lang-dot {
+    display: inline-block;
+    width: 9px; height: 9px; border-radius: 50%;
+    margin-right: 4px;
+    vertical-align: middle;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="header">
+    <div class="header-inner">
+      <a href="landing.html" class="wordmark"><span class="prompt">&gt;</span><span class="name">gh-dash</span></a>
+      <div class="search-inline">
+        <span class="prefix">$</span>
+        <input type="text" placeholder="search handle..." value="davidsilva131" />
+      </div>
+      <nav class="tabs">
+        <button class="tab" data-tab="overview" onclick="window.location='overview.html'">overview</button>
+        <button class="tab active" data-tab="repos">repos</button>
+        <button class="tab" data-tab="activity" onclick="window.location='activity.html'">activity</button>
+        <button class="tab" data-tab="charts" onclick="window.location='charts.html'">charts</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="content">
+    <div class="container">
+
+      <div class="toolbar">
+        <div class="count">&gt; <span class="n">47</span> public repositories</div>
+        <div class="segmented" role="tablist">
+          <button class="active" data-sort="stars">most stars</button>
+          <button data-sort="recent">recently updated</button>
+        </div>
+      </div>
+
+      <section class="repo-grid">
+        
+    <article class="repo-card card glow-cyan">
+      <header class="repo-head">
+        <svg class="repo-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+          <path d="M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 0 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 0 1-1.072 1.05A2.495 2.495 0 0 1 2 11.5Zm10.5-1h-8a1 1 0 0 0-1 1v6.708A2.486 2.486 0 0 1 4.5 9h8ZM5 12.25a.25.25 0 0 1 .25-.25h3.5a.25.25 0 0 1 .25.25v3.25a.25.25 0 0 1-.4.2l-1.45-1.087a.249.249 0 0 0-.3 0L5.4 15.7a.25.25 0 0 1-.4-.2Z"/>
+        </svg>
+        <a href="#" class="repo-name">gh-dash</a>
+        <span class="repo-visibility">public</span>
+      </header>
+      <p class="repo-desc">Personal GitHub dashboard. Astro 7 SSR + React 19 + Tailwind v4 + shadcn/ui. Deployed on Railway.</p>
+      <footer class="repo-meta mono">
+        <span class="meta-lang">
+          <span class="lang-dot" style="background: #278bd1; box-shadow: 0 0 4px #278bd1;"></span>
+          typescript
+        </span>
+        <span class="meta-item">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.751.751 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/></svg>
+          247
+        </span>
+        <span class="meta-item">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M5 5.372v.878c0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75v-.878a2.25 2.25 0 1 1 1.5 0v.878a2.25 2.25 0 0 1-2.25 2.25h-1.5v2.128a2.251 2.251 0 1 1-1.5 0V8.5h-1.5A2.25 2.25 0 0 1 3.5 6.25v-.878a2.25 2.25 0 1 1 1.5 0ZM5 3.25a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Zm6.75.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm-3 8.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z"/></svg>
+          18
+        </span>
+        <span class="meta-item meta-time">updated 2d ago</span>
+      </footer>
+    </article>
+
+    <article class="repo-card card glow-cyan">
+      <header class="repo-head">
+        <svg class="repo-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+          <path d="M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 0 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 0 1-1.072 1.05A2.495 2.495 0 0 1 2 11.5Zm10.5-1h-8a1 1 0 0 0-1 1v6.708A2.486 2.486 0 0 1 4.5 9h8ZM5 12.25a.25.25 0 0 1 .25-.25h3.5a.25.25 0 0 1 .25.25v3.25a.25.25 0 0 1-.4.2l-1.45-1.087a.249.249 0 0 0-.3 0L5.4 15.7a.25.25 0 0 1-.4-.2Z"/>
+        </svg>
+        <a href="#" class="repo-name">instaboost-astro</a>
+        <span class="repo-visibility">public</span>
+      </header>
+      <p class="repo-desc">Instagram growth analytics dashboard built on Astro SSR with the official Graph API.</p>
+      <footer class="repo-meta mono">
+        <span class="meta-lang">
+          <span class="lang-dot" style="background: #cc7533; box-shadow: 0 0 4px #cc7533;"></span>
+          astro
+        </span>
+        <span class="meta-item">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.751.751 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/></svg>
+          89
+        </span>
+        <span class="meta-item">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M5 5.372v.878c0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75v-.878a2.25 2.25 0 1 1 1.5 0v.878a2.25 2.25 0 0 1-2.25 2.25h-1.5v2.128a2.251 2.251 0 1 1-1.5 0V8.5h-1.5A2.25 2.25 0 0 1 3.5 6.25v-.878a2.25 2.25 0 1 1 1.5 0ZM5 3.25a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Zm6.75.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm-3 8.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z"/></svg>
+          7
+        </span>
+        <span class="meta-item meta-time">updated 1w ago</span>
+      </footer>
+    </article>
+
+    <article class="repo-card card glow-cyan">
+      <header class="repo-head">
+        <svg class="repo-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+          <path d="M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 0 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 0 1-1.072 1.05A2.495 2.495 0 0 1 2 11.5Zm10.5-1h-8a1 1 0 0 0-1 1v6.708A2.486 2.486 0 0 1 4.5 9h8ZM5 12.25a.25.25 0 0 1 .25-.25h3.5a.25.25 0 0 1 .25.25v3.25a.25.25 0 0 1-.4.2l-1.45-1.087a.249.249 0 0 0-.3 0L5.4 15.7a.25.25 0 0 1-.4-.2Z"/>
+        </svg>
+        <a href="#" class="repo-name">silva-skills</a>
+        <span class="repo-visibility">public</span>
+      </header>
+      <p class="repo-desc">Curated collection of Claude / Hermes / agent skills. Markdown-driven, JSON-frontmatter.</p>
+      <footer class="repo-meta mono">
+        <span class="meta-lang">
+          <span class="lang-dot" style="background: #278bd1; box-shadow: 0 0 4px #278bd1;"></span>
+          typescript
+        </span>
+        <span class="meta-item">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.751.751 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/></svg>
+          134
+        </span>
+        <span class="meta-item">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M5 5.372v.878c0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75v-.878a2.25 2.25 0 1 1 1.5 0v.878a2.25 2.25 0 0 1-2.25 2.25h-1.5v2.128a2.251 2.251 0 1 1-1.5 0V8.5h-1.5A2.25 2.25 0 0 1 3.5 6.25v-.878a2.25 2.25 0 1 1 1.5 0ZM5 3.25a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Zm6.75.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm-3 8.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z"/></svg>
+          22
+        </span>
+        <span class="meta-item meta-time">updated 3w ago</span>
+      </footer>
+    </article>
+
+    <article class="repo-card card glow-cyan">
+      <header class="repo-head">
+        <svg class="repo-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+          <path d="M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 0 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 0 1-1.072 1.05A2.495 2.495 0 0 1 2 11.5Zm10.5-1h-8a1 1 0 0 0-1 1v6.708A2.486 2.486 0 0 1 4.5 9h8ZM5 12.25a.25.25 0 0 1 .25-.25h3.5a.25.25 0 0 1 .25.25v3.25a.25.25 0 0 1-.4.2l-1.45-1.087a.249.249 0 0 0-.3 0L5.4 15.7a.25.25 0 0 1-.4-.2Z"/>
+        </svg>
+        <a href="#" class="repo-name">recetas-app</a>
+        <span class="repo-visibility">public</span>
+      </header>
+      <p class="repo-desc">Recipe browser with tag filters, scale-to-servings, and an offline PWA mode.</p>
+      <footer class="repo-meta mono">
+        <span class="meta-lang">
+          <span class="lang-dot" style="background: #c0de7b; box-shadow: 0 0 4px #c0de7b;"></span>
+          javascript
+        </span>
+        <span class="meta-item">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.751.751 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/></svg>
+          56
+        </span>
+        <span class="meta-item">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M5 5.372v.878c0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75v-.878a2.25 2.25 0 1 1 1.5 0v.878a2.25 2.25 0 0 1-2.25 2.25h-1.5v2.128a2.251 2.251 0 1 1-1.5 0V8.5h-1.5A2.25 2.25 0 0 1 3.5 6.25v-.878a2.25 2.25 0 1 1 1.5 0ZM5 3.25a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Zm6.75.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm-3 8.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z"/></svg>
+          4
+        </span>
+        <span class="meta-item meta-time">updated 1mo ago</span>
+      </footer>
+    </article>
+
+    <article class="repo-card card glow-cyan">
+      <header class="repo-head">
+        <svg class="repo-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+          <path d="M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 0 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 0 1-1.072 1.05A2.495 2.495 0 0 1 2 11.5Zm10.5-1h-8a1 1 0 0 0-1 1v6.708A2.486 2.486 0 0 1 4.5 9h8ZM5 12.25a.25.25 0 0 1 .25-.25h3.5a.25.25 0 0 1 .25.25v3.25a.25.25 0 0 1-.4.2l-1.45-1.087a.249.249 0 0 0-.3 0L5.4 15.7a.25.25 0 0 1-.4-.2Z"/>
+        </svg>
+        <a href="#" class="repo-name">ayverson-portfolio</a>
+        <span class="repo-visibility">public</span>
+      </header>
+      <p class="repo-desc">A photographer's portfolio site. Astro image pipeline + sharp + responsive grid.</p>
+      <footer class="repo-meta mono">
+        <span class="meta-lang">
+          <span class="lang-dot" style="background: #cc7533; box-shadow: 0 0 4px #cc7533;"></span>
+          astro
+        </span>
+        <span class="meta-item">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.751.751 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/></svg>
+          31
+        </span>
+        <span class="meta-item">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M5 5.372v.878c0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75v-.878a2.25 2.25 0 1 1 1.5 0v.878a2.25 2.25 0 0 1-2.25 2.25h-1.5v2.128a2.251 2.251 0 1 1-1.5 0V8.5h-1.5A2.25 2.25 0 0 1 3.5 6.25v-.878a2.25 2.25 0 1 1 1.5 0ZM5 3.25a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Zm6.75.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm-3 8.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z"/></svg>
+          2
+        </span>
+        <span class="meta-item meta-time">updated 2mo ago</span>
+      </footer>
+    </article>
+
+    <article class="repo-card card glow-cyan">
+      <header class="repo-head">
+        <svg class="repo-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+          <path d="M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 0 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 0 1-1.072 1.05A2.495 2.495 0 0 1 2 11.5Zm10.5-1h-8a1 1 0 0 0-1 1v6.708A2.486 2.486 0 0 1 4.5 9h8ZM5 12.25a.25.25 0 0 1 .25-.25h3.5a.25.25 0 0 1 .25.25v3.25a.25.25 0 0 1-.4.2l-1.45-1.087a.249.249 0 0 0-.3 0L5.4 15.7a.25.25 0 0 1-.4-.2Z"/>
+        </svg>
+        <a href="#" class="repo-name">academieudalioarriaga</a>
+        <span class="repo-visibility">public</span>
+      </header>
+      <p class="repo-desc">Educational platform: course catalog, video lessons, progress tracking. Next.js + Prisma.</p>
+      <footer class="repo-meta mono">
+        <span class="meta-lang">
+          <span class="lang-dot" style="background: #278bd1; box-shadow: 0 0 4px #278bd1;"></span>
+          typescript
+        </span>
+        <span class="meta-item">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.751.751 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/></svg>
+          12
+        </span>
+        <span class="meta-item">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M5 5.372v.878c0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75v-.878a2.25 2.25 0 1 1 1.5 0v.878a2.25 2.25 0 0 1-2.25 2.25h-1.5v2.128a2.251 2.251 0 1 1-1.5 0V8.5h-1.5A2.25 2.25 0 0 1 3.5 6.25v-.878a2.25 2.25 0 1 1 1.5 0ZM5 3.25a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Zm6.75.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm-3 8.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z"/></svg>
+          3
+        </span>
+        <span class="meta-item meta-time">updated 5mo ago</span>
+      </footer>
+    </article>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-line">
+        &gt; built with: <span class="accent">astro</span> · <span class="accent">react</span> · <span class="accent">tailwind</span> · <span class="accent">shadcn/ui</span> · <span class="accent">recharts</span>
+      </div>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+  // Segmented control toggle
+  document.querySelectorAll('.segmented button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.segmented button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+  // Tabs allow real navigation
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', (e) => {
+      const tab = t.dataset.tab;
+      if (!tab || tab === 'repos') {
+        e.preventDefault();
+        document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+        t.classList.add('active');
+      }
+    });
+  });
+</script>
+</body>
+</html>

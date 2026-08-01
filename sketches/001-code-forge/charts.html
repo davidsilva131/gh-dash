@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>davidsilva131 . Charts . gh-dash</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles.css"/>
+  <style>
+    .grid-2x2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .grid-2x2 > .card { min-width: 0; }
+    .donut-legend { display: flex; flex-direction: column; gap: 8px; font-size: 12px; }
+    .donut-legend .row { display: flex; align-items: center; gap: 8px; }
+    .donut-legend .row .name { color: var(--fg-muted); flex: 1; }
+    .donut-legend .row .val { color: var(--fg); font-family: var(--font-mono); }
+    .donut-wrap { display: flex; align-items: center; gap: 20px; }
+    .donut-center { font-family: var(--font-mono); }
+    .bar-chart .bar-row { display: flex; align-items: center; gap: 10px; font-size: 12px; margin-bottom: 10px; }
+    .bar-chart .bar-name { width: 130px; flex-shrink: 0; color: var(--fg-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .bar-chart .bar-track { flex: 1; height: 18px; background: var(--bg-elev-2); border-radius: 4px; overflow: hidden; }
+    .bar-chart .bar-fill { height: 100%; background: linear-gradient(90deg, #6366f1, #818cf8); border-radius: 4px; transition: width 600ms ease; }
+    .bar-chart .bar-val { width: 36px; text-align: right; font-family: var(--font-mono); color: var(--fg); flex-shrink: 0; }
+    .heat-year { overflow-x: auto; padding-bottom: 4px; }
+    .heat-year-grid { display: grid; grid-template-columns: repeat(53, 10px); grid-template-rows: repeat(7, 10px); gap: 2px; min-width: max-content; }
+    .heat-year .heat-cell { width: 10px; height: 10px; }
+    .line-chart svg { display: block; width: 100%; height: auto; }
+    .line-axis text { font-family: var(--font-mono); font-size: 10px; fill: var(--fg-subtle); }
+    .line-grid { stroke: var(--border); stroke-width: 1; stroke-dasharray: 2 4; }
+    .line-path { fill: none; stroke: var(--accent); stroke-width: 2; }
+    .line-area { fill: url(#areaGrad); opacity: 0.5; }
+    .line-pt { fill: var(--accent); stroke: var(--bg-elev); stroke-width: 2; }
+    .chart-legend { display: flex; gap: 12px; font-size: 11px; color: var(--fg-subtle); margin-top: 8px; }
+    .chart-tooltip { position: absolute; background: var(--bg-elev); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; font-size: 12px; color: var(--fg); pointer-events: none; box-shadow: 0 4px 16px rgba(0,0,0,0.3); transform: translate(-50%, -100%); white-space: nowrap; z-index: 5; }
+  </style>
+</head>
+<body>
+  <header class="shell">
+    <div class="row">
+      <a href="overview.html" class="wordmark">
+        <svg class="octo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="16" cy="16" r="15" stroke="currentColor" stroke-width="1.5"/>
+          <circle cx="11.5" cy="13.5" r="1.6" fill="currentColor"/>
+          <circle cx="20.5" cy="13.5" r="1.6" fill="currentColor"/>
+          <path d="M11 20 Q16 24 21 20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+          <path d="M5 16 L9 16 M23 16 L27 16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M16 1 L16 5 M16 27 L16 31" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        gh-dash
+      </a>
+      <div class="search-inline">
+        <span class="icon">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M11 11 L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </span>
+        <input type="text" placeholder="Search repos, users, anything..." id="topSearch"/>
+      </div>
+      <nav class="tabs" role="tablist">
+        <a class="tab" href="overview.html" data-tab="overview">Overview</a>
+        <a class="tab" href="repos.html" data-tab="repos">Repos</a>
+        <a class="tab" href="activity.html" data-tab="activity">Activity</a>
+        <a class="tab" href="charts.html" data-tab="charts" aria-current="page">Charts</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="grid-2x2">
+
+      <!-- Donut: Languages -->
+      <div class="card">
+        <div class="h-section"><h2>Languages</h2><span class="meta">across all repos</span></div>
+        <div class="donut-wrap">
+          <svg id="donut" viewBox="0 0 160 160" width="160" height="160" style="flex-shrink: 0;"></svg>
+          <div class="donut-legend" id="donutLegend" style="flex: 1;"></div>
+        </div>
+      </div>
+
+      <!-- Bar: Stars per repo -->
+      <div class="card bar-chart">
+        <div class="h-section"><h2>Stars per repo</h2><span class="meta">top 6</span></div>
+        <div id="barList"></div>
+      </div>
+
+      <!-- Heatmap: full year -->
+      <div class="card" style="grid-column: 1 / -1;">
+        <div class="h-section">
+          <h2>Contributions</h2>
+          <span class="meta"><span class="num" style="color: var(--fg); font-weight: 600;">2,389</span> in the last 12 months</span>
+        </div>
+        <div class="heat-year" id="heatYear"></div>
+        <div class="heat-legend" style="margin-top: 12px;">
+          Less
+          <span class="swatch" style="background: var(--bg-elev-2)"></span>
+          <span class="swatch" style="background: var(--green-1)"></span>
+          <span class="swatch" style="background: var(--green-2)"></span>
+          <span class="swatch" style="background: var(--green-3)"></span>
+          <span class="swatch" style="background: var(--green-4)"></span>
+          More
+        </div>
+      </div>
+
+      <!-- Line: monthly activity -->
+      <div class="card line-chart" style="grid-column: 1 / -1;">
+        <div class="h-section"><h2>Activity</h2><span class="meta">commits per month</span></div>
+        <svg id="lineChart" viewBox="0 0 600 200" preserveAspectRatio="none" style="width: 100%; height: 200px;"></svg>
+        <div class="chart-legend">
+          <span>2025</span>
+          <span style="color: var(--fg-muted);">. Peak: <span class="num" style="color: var(--fg);">152</span> in October</span>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="foot">
+    Built with <strong>Astro 7</strong> + <strong>React 19</strong> + <strong>Tailwind v4</strong> + <strong>shadcn/ui</strong> + <strong>Recharts</strong>
+  </footer>
+
+  <script>
+    // ============ DONUT: Languages ============
+    (function() {
+      var slices = [
+        { name: "TypeScript",   value: 18, color: "#3178c6" },
+        { name: "Astro",        value: 7,  color: "#ff5d01" },
+        { name: "Python",       value: 9,  color: "#3572A5" },
+        { name: "JavaScript",   value: 5,  color: "#f1e05a" },
+        { name: "Go",           value: 3,  color: "#00ADD8" }
+      ];
+      var total = slices.reduce(function(s, x) { return s + x.value; }, 0);
+      var cx = 80, cy = 80, r = 56, sw = 22;
+      var startAngle = -Math.PI / 2;
+      var paths = "";
+      var donut = document.getElementById('donut');
+      slices.forEach(function(s) {
+        var angle = (s.value / total) * Math.PI * 2;
+        var endAngle = startAngle + angle;
+        var large = angle > Math.PI ? 1 : 0;
+        var x1 = cx + r * Math.cos(startAngle);
+        var y1 = cy + r * Math.sin(startAngle);
+        var x2 = cx + r * Math.cos(endAngle);
+        var y2 = cy + r * Math.sin(endAngle);
+        var path = "M " + x1 + " " + y1 + " A " + r + " " + r + " 0 " + large + " 1 " + x2 + " " + y2;
+        paths += '<path d="' + path + '" stroke="' + s.color + '" stroke-width="' + sw + '" fill="none" stroke-linecap="butt"/>';
+        startAngle = endAngle;
+      });
+      paths += '<text x="' + cx + '" y="' + (cy - 2) + '" text-anchor="middle" class="donut-center" fill="var(--fg)" font-size="22" font-weight="600">' + total + '</text>';
+      paths += '<text x="' + cx + '" y="' + (cy + 16) + '" text-anchor="middle" fill="var(--fg-subtle)" font-size="9" font-family="var(--font-sans)">repos</text>';
+      donut.innerHTML = paths;
+
+      var legend = document.getElementById('donutLegend');
+      legend.innerHTML = slices.map(function(s) {
+        var pct = Math.round((s.value / total) * 100);
+        return '<div class="row"><span class="lang-dot" style="background:' + s.color + '"></span><span class="name">' + s.name + '</span><span class="val">' + s.value + ' . ' + pct + '%</span></div>';
+      }).join('');
+    })();
+
+    // ============ BAR: Stars per repo ============
+    (function() {
+      var data = [
+        { name: "recetas-app",         stars: 23 },
+        { name: "gh-dash",             stars: 12 },
+        { name: "instaboost-astro",    stars: 8 },
+        { name: "silva-skills",        stars: 5 },
+        { name: "ayverson-portfolio",  stars: 4 },
+        { name: "academieudalioarriaga", stars: 2 }
+      ];
+      var max = Math.max.apply(null, data.map(function(d) { return d.stars; }));
+      var html = data.map(function(d) {
+        var pct = (d.stars / max) * 100;
+        return '<div class="bar-row" data-tooltip="' + d.name + ': ' + d.stars + ' stars">' +
+                 '<span class="bar-name mono">' + d.name + '</span>' +
+                 '<span class="bar-track"><span class="bar-fill" style="width: 0%" data-fill="' + pct + '"></span></span>' +
+                 '<span class="bar-val">' + d.stars + '</span>' +
+               '</div>';
+      }).join('');
+      document.getElementById('barList').innerHTML = html;
+      setTimeout(function() {
+        document.querySelectorAll('#barList [data-fill]').forEach(function(el) {
+          el.style.width = el.getAttribute('data-fill') + '%';
+        });
+      }, 50);
+    })();
+
+    // ============ HEATMAP: full year ============
+    (function() {
+      var grid = document.getElementById('heatYear');
+      if (!grid) return;
+      var wrap = document.createElement('div');
+      wrap.className = 'heat-year-grid';
+      var colors = ['var(--bg-elev-2)', 'var(--green-1)', 'var(--green-2)', 'var(--green-3)', 'var(--green-4)'];
+      function rand(i) {
+        var t = (i + 0x6D2B79F5) | 0;
+        t = Math.imul(t ^ (t >>> 15), t | 1);
+        t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      }
+      for (var week = 0; week < 53; week++) {
+        for (var day = 0; day < 7; day++) {
+          var idx = week * 7 + day;
+          var wd = (day === 0 || day === 6) ? 0.3 : 1;
+          var r = rand(idx + 99);
+          var level = 0;
+          if (r < 0.40 * wd) level = 0;
+          else if (r < 0.62) level = 1;
+          else if (r < 0.78) level = 2;
+          else if (r < 0.92) level = 3;
+          else level = 4;
+          var cell = document.createElement('div');
+          cell.className = 'heat-cell';
+          cell.style.background = colors[level];
+          cell.title = (level * 3 + 1) + ' contributions';
+          wrap.appendChild(cell);
+        }
+      }
+      grid.appendChild(wrap);
+    })();
+
+    // ============ LINE: monthly activity ============
+    (function() {
+      var months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+      var values = [42, 67, 88, 74, 95, 110, 98, 124, 138, 152, 121, 89];
+      var W = 600, H = 200, P = { l: 36, r: 16, t: 16, b: 28 };
+      var maxV = 160;
+      var stepX = (W - P.l - P.r) / (values.length - 1);
+      var pts = values.map(function(v, i) {
+        return { x: P.l + i * stepX, y: H - P.b - (v / maxV) * (H - P.t - P.b) };
+      });
+      var path = pts.map(function(p, i) { return (i === 0 ? "M " : "L ") + p.x + " " + p.y; }).join(" ");
+      var area = path + " L " + pts[pts.length-1].x + " " + (H - P.b) + " L " + pts[0].x + " " + (H - P.b) + " Z";
+
+      // gridlines
+      var grid = "";
+      for (var g = 0; g <= 4; g++) {
+        var y = P.t + (g / 4) * (H - P.t - P.b);
+        var v = Math.round(maxV - (g / 4) * maxV);
+        grid += '<line class="line-grid" x1="' + P.l + '" y1="' + y + '" x2="' + (W - P.r) + '" y2="' + y + '"/>';
+        grid += '<text class="line-axis" x="' + (P.l - 6) + '" y="' + (y + 3) + '" text-anchor="end">' + v + '</text>';
+      }
+      // x labels
+      var labels = months.map(function(m, i) {
+        return '<text class="line-axis" x="' + pts[i].x + '" y="' + (H - P.b + 14) + '" text-anchor="middle">' + m + '</text>';
+      }).join("");
+      // points
+      var dots = pts.map(function(p) {
+        return '<circle class="line-pt" cx="' + p.x + '" cy="' + p.y + '" r="3.5"/>';
+      }).join("");
+
+      var svg = '' +
+        '<defs><linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">' +
+        '<stop offset="0%" stop-color="#6366f1" stop-opacity="0.5"/>' +
+        '<stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>' +
+        '</linearGradient></defs>' +
+        grid +
+        '<path class="line-area" d="' + area + '"/>' +
+        '<path class="line-path" d="' + path + '"/>' +
+        dots +
+        labels;
+      document.getElementById('lineChart').innerHTML = svg;
+    })();
+
+    // Top search
+    document.addEventListener('DOMContentLoaded', function() {
+      var input = document.getElementById('topSearch');
+      if (input) {
+        input.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' && input.value.trim()) {
+            window.location.href = 'overview.html?u=' + encodeURIComponent(input.value.trim());
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>

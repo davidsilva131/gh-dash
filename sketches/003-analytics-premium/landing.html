@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>gh-dash — GitHub Personal Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#09090b; --bg-elev:#111114; --bg-elev-2:#18181c;
+    --border:#1f1f25; --border-hover:#2a2a35;
+    --fg:#fafafa; --fg-muted:#a1a1aa; --fg-subtle:#71717a;
+    --brand-1:#818cf8; --brand-2:#a78bfa;
+    --brand-gradient:linear-gradient(135deg,#818cf8 0%,#a78bfa 100%);
+    --brand-glow:radial-gradient(circle,rgba(129,140,248,0.15) 0%,transparent 70%);
+    --green:#22c55e;
+    --radius:16px;
+    --font-sans:'Geist',-apple-system,BlinkMacSystemFont,sans-serif;
+    --font-mono:'Geist Mono','JetBrains Mono',ui-monospace,monospace;
+    --shadow-soft:0 1px 2px rgba(0,0,0,0.3),0 0 0 1px var(--border);
+    --shadow-glow:0 8px 32px -8px rgba(129,140,248,0.25);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--fg);font-family:var(--font-sans);-webkit-font-smoothing:antialiased;font-feature-settings:"cv11","ss01","ss03"}
+  body{min-height:100vh;overflow-x:hidden;position:relative}
+  body::before{
+    content:"";position:fixed;inset:-20%;z-index:0;pointer-events:none;
+    background:
+      radial-gradient(circle at 20% 30%, rgba(129,140,248,0.18) 0%, transparent 45%),
+      radial-gradient(circle at 80% 60%, rgba(167,139,250,0.16) 0%, transparent 45%),
+      radial-gradient(circle at 50% 80%, rgba(99,102,241,0.10) 0%, transparent 50%);
+    filter:blur(40px);
+    animation: drift 28s linear infinite alternate;
+    opacity:0.85;
+  }
+  @keyframes drift{
+    0%{transform:translate(0,0) scale(1)}
+    50%{transform:translate(2%,-2%) scale(1.05)}
+    100%{transform:translate(-2%,1%) scale(1)}
+  }
+  body::after{
+    content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.015) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(255,255,255,0.015) 1px,transparent 1px);
+    background-size:48px 48px;
+    mask-image:radial-gradient(circle at center,black 30%,transparent 75%);
+  }
+  .container{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:24px}
+  @media(min-width:768px){.container{padding:32px}}
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:18px 0;margin-bottom:60px;
+  }
+  .wordmark{
+    font-size:22px;font-weight:700;letter-spacing:-0.02em;
+    background:var(--brand-gradient);-webkit-background-clip:text;background-clip:text;color:transparent;
+    display:inline-flex;align-items:center;gap:8px;text-decoration:none;
+  }
+  .wordmark .dot{width:8px;height:8px;border-radius:50%;background:var(--brand-1);box-shadow:0 0 12px var(--brand-1)}
+  .top-meta{font-size:13px;color:var(--fg-subtle);font-family:var(--font-mono)}
+  .top-meta a{color:var(--fg-muted);text-decoration:none;border-bottom:1px dashed var(--border-hover);padding-bottom:1px}
+  .top-meta a:hover{color:var(--fg);border-color:var(--brand-1)}
+  .hero{
+    position:relative;
+    max-width:720px;margin:60px auto 0;text-align:center;
+  }
+  .hero::before{
+    content:"";position:absolute;inset:-80px -120px;z-index:-1;
+    background:var(--brand-glow);
+    pointer-events:none;
+  }
+  .badge-row{display:flex;justify-content:center;gap:8px;margin-bottom:28px;flex-wrap:wrap}
+  .badge{
+    display:inline-flex;align-items:center;gap:6px;
+    font-size:12px;padding:6px 12px;border-radius:999px;
+    border:1px solid var(--border);background:rgba(255,255,255,0.02);
+    color:var(--fg-muted);font-family:var(--font-mono);
+  }
+  .badge .pulse{width:6px;height:6px;border-radius:50%;background:#22c55e;box-shadow:0 0 8px #22c55e;animation:pulse 2s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+  h1.title{
+    font-size:72px;line-height:1.02;margin:0 0 18px;
+    font-weight:700;letter-spacing:-0.04em;
+    background:linear-gradient(180deg,#fafafa 0%,#a1a1aa 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  h1.title .grad{
+    background:var(--brand-gradient);-webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .tagline{font-size:18px;color:var(--fg-muted);margin:0 0 12px;line-height:1.5}
+  .sub{font-size:15px;color:var(--fg-subtle);margin:0 auto 40px;line-height:1.6;max-width:520px}
+  .input-row{
+    display:flex;gap:8px;
+    background:rgba(17,17,20,0.6);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:6px;
+    box-shadow:var(--shadow-soft),0 24px 80px -24px rgba(0,0,0,0.6);
+    backdrop-filter:blur(12px) saturate(180%);
+    -webkit-backdrop-filter:blur(12px) saturate(180%);
+  }
+  .input-row:focus-within{border-color:var(--brand-1);box-shadow:0 0 0 4px rgba(129,140,248,0.15),var(--shadow-soft)}
+  .input-row input{
+    flex:1;min-width:0;
+    background:transparent;border:0;outline:0;
+    color:var(--fg);font:500 15px/1 var(--font-sans);
+    padding:14px 18px;border-radius:10px;
+  }
+  .input-row input::placeholder{color:var(--fg-subtle)}
+  .input-row .at{
+    display:flex;align-items:center;padding-left:18px;color:var(--fg-subtle);font-family:var(--font-mono);font-size:14px;
+  }
+  .btn-primary{
+    border:0;cursor:pointer;
+    background:var(--brand-gradient);
+    color:#fff;font:600 14px/1 var(--font-sans);letter-spacing:-0.01em;
+    padding:14px 22px;border-radius:10px;
+    display:inline-flex;align-items:center;gap:8px;
+    box-shadow:0 1px 0 rgba(255,255,255,0.15) inset, 0 8px 24px -8px rgba(129,140,248,0.5);
+    transition:transform 200ms ease, box-shadow 200ms ease;
+  }
+  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 1px 0 rgba(255,255,255,0.2) inset, 0 12px 28px -8px rgba(129,140,248,0.7)}
+  .btn-primary:active{transform:translateY(0)}
+  .btn-primary .arrow{transition:transform 200ms}
+  .btn-primary:hover .arrow{transform:translateX(2px)}
+  .hint-row{
+    margin-top:18px;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;
+  }
+  .hint-label{font-size:13px;color:var(--fg-subtle)}
+  .chip{
+    display:inline-flex;align-items:center;gap:6px;
+    font:500 12px/1 var(--font-mono);
+    padding:7px 12px;border-radius:999px;
+    border:1px solid var(--border);background:rgba(255,255,255,0.02);color:var(--fg-muted);
+    text-decoration:none;cursor:pointer;transition:all 200ms;
+  }
+  .chip:hover{border-color:var(--border-hover);color:var(--fg);background:rgba(129,140,248,0.06)}
+  .chip .try{color:var(--fg-subtle);font-size:10px;text-transform:uppercase;letter-spacing:0.08em}
+  .features{
+    margin-top:96px;
+    display:grid;grid-template-columns:repeat(3,1fr);gap:16px;
+  }
+  @media(max-width:780px){.features{grid-template-columns:1fr}}
+  .feat{
+    padding:24px;border-radius:var(--radius);
+    background:rgba(17,17,20,0.5);border:1px solid var(--border);
+    backdrop-filter:blur(8px);
+  }
+  .feat .ic{
+    width:36px;height:36px;border-radius:10px;
+    background:rgba(129,140,248,0.10);color:var(--brand-2);
+    display:flex;align-items:center;justify-content:center;margin-bottom:14px;
+  }
+  .feat h3{margin:0 0 6px;font-size:15px;font-weight:600}
+  .feat p{margin:0;font-size:13px;color:var(--fg-muted);line-height:1.5}
+  .footer{
+    margin-top:80px;padding:32px 0;border-top:1px solid var(--border);
+    text-align:center;color:var(--fg-subtle);font-size:12px;font-family:var(--font-mono);
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;
+  }
+  .footer .stack{color:var(--fg-muted)}
+  .footer .stack span{color:var(--fg-subtle)}
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="topbar">
+      <a href="./landing.html" class="wordmark"><span class="dot"></span>gh-dash</a>
+      <div class="top-meta">v0.1 · <a href="./overview.html">demo →</a></div>
+    </header>
+
+    <main class="hero">
+      <div class="badge-row">
+        <span class="badge"><span class="pulse"></span>Public beta</span>
+        <span class="badge">SSR · Astro 7 · React 19</span>
+      </div>
+
+      <h1 class="title">GitHub, but <span class="grad">delightful.</span></h1>
+      <p class="tagline">A premium personal dashboard for any GitHub profile.</p>
+      <p class="sub">Discover any developer's repositories, contribution history, and activity in a beautifully crafted interface — built for people who care about craft.</p>
+
+      <form class="input-row" onsubmit="event.preventDefault();window.location.href='./overview.html'">
+        <span class="at">github.com/</span>
+        <input type="text" placeholder="username" value="" autocomplete="off" spellcheck="false" autofocus />
+        <button type="submit" class="btn-primary">View Dashboard <span class="arrow">→</span></button>
+      </form>
+
+      <div class="hint-row">
+        <span class="hint-label">Try a profile:</span>
+        <a class="chip" href="./overview.html"><span class="try">demo</span>davidsilva131</a>
+        <a class="chip" href="./overview.html"><span class="try">demo</span>torvalds</a>
+        <a class="chip" href="./overview.html"><span class="try">demo</span>gaearon</a>
+      </div>
+    </main>
+
+    <section class="features">
+      <div class="feat">
+        <div class="ic">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-5"/></svg>
+        </div>
+        <h3>Contribution analytics</h3>
+        <p>Year-long heatmaps, language breakdowns, and per-repo star trends rendered with smooth gradients.</p>
+      </div>
+      <div class="feat">
+        <div class="ic">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        </div>
+        <h3>Repo grid that breathes</h3>
+        <p>Generous spacing, soft elevation, and considered typography make browsing a 50-repo profile feel calm.</p>
+      </div>
+      <div class="feat">
+        <div class="ic">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        </div>
+        <h3>Live activity stream</h3>
+        <p>Pushes, PRs, and stars from the people you follow — surfaced with type-aware icons and crisp timestamps.</p>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div>© 2026 gh-dash</div>
+      <div class="stack">Built with <span>Astro 7</span> · <span>React 19</span> · <span>Tailwind v4</span> · <span>shadcn/ui</span> · <span>Recharts</span></div>
+    </footer>
+  </div>
+</body>
+</html>

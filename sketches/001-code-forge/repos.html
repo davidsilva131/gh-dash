@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>davidsilva131 . Repos . gh-dash</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+  <header class="shell">
+    <div class="row">
+      <a href="overview.html" class="wordmark">
+        <svg class="octo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="16" cy="16" r="15" stroke="currentColor" stroke-width="1.5"/>
+          <circle cx="11.5" cy="13.5" r="1.6" fill="currentColor"/>
+          <circle cx="20.5" cy="13.5" r="1.6" fill="currentColor"/>
+          <path d="M11 20 Q16 24 21 20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+          <path d="M5 16 L9 16 M23 16 L27 16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M16 1 L16 5 M16 27 L16 31" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        gh-dash
+      </a>
+      <div class="search-inline">
+        <span class="icon">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M11 11 L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </span>
+        <input type="text" placeholder="Search repos, users, anything..." id="topSearch"/>
+      </div>
+      <nav class="tabs" role="tablist">
+        <a class="tab" href="overview.html" data-tab="overview">Overview</a>
+        <a class="tab" href="repos.html" data-tab="repos" aria-current="page">Repos</a>
+        <a class="tab" href="activity.html" data-tab="activity">Activity</a>
+        <a class="tab" href="charts.html" data-tab="charts">Charts</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- Toolbar -->
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+      <div style="font-size: 14px;">
+        <span class="num" style="color: var(--fg); font-weight: 600; font-size: 18px;">42</span>
+        <span style="color: var(--fg-muted);">repositories</span>
+      </div>
+      <div class="segmented" id="sortControl">
+        <button type="button" data-sort="stars" aria-pressed="true">Most Stars</button>
+        <button type="button" data-sort="updated" aria-pressed="false">Recently Updated</button>
+      </div>
+    </div>
+
+    <!-- Repo grid -->
+    <div class="cols-2" id="repoGrid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+      <!-- Repos populated by script -->
+    </div>
+  </main>
+
+  <footer class="foot">
+    Built with <strong>Astro 7</strong> + <strong>React 19</strong> + <strong>Tailwind v4</strong> + <strong>shadcn/ui</strong> + <strong>Recharts</strong>
+  </footer>
+
+  <script>
+    var REPOS = [
+      { name: "gh-dash", lang: "TypeScript", langColor: "#3178c6", desc: "GitHub Personal Dashboard. Astro 7 SSR + React 19 + Tailwind v4. The very thing rendering this page.", stars: 12, forks: 3, time: "2 days ago" },
+      { name: "instaboost-astro", lang: "Astro", langColor: "#ff5d01", desc: "Lighthouse 100 + instant-load marketing site starter. View transitions, MDX, no client JS by default.", stars: 8, forks: 1, time: "1 week ago" },
+      { name: "silva-skills", lang: "TypeScript", langColor: "#3178c6", desc: "My personal Claude/agent skill library. Workflow primitives, code-review patterns, refactor recipes.", stars: 5, forks: 0, time: "2 weeks ago" },
+      { name: "recetas-app", lang: "TypeScript", langColor: "#3178c6", desc: "Family recipe keeper. Offline-first PWA, ingredients scale by servings, share via deep link.", stars: 23, forks: 4, time: "1 month ago" },
+      { name: "ayverson-portfolio", lang: "Astro", langColor: "#ff5d01", desc: "Photography portfolio for a friend. Static, image-optimized, ships ~12kb JS total.", stars: 4, forks: 0, time: "3 months ago" },
+      { name: "academieudalioarriaga", lang: "JavaScript", langColor: "#f1e05a", desc: "Course platform for an online academy. Next.js + Prisma + Stripe. Lesson progress, certificates.", stars: 2, forks: 0, time: "6 months ago" }
+    ];
+
+    function langDot(color) { return '<span class="lang-dot" style="background:' + color + '"></span>'; }
+    function starIcon() { return '<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 1.5 L9.85 5.6 L14.3 6.2 L11 9.3 L11.95 13.7 L8 11.5 L4.05 13.7 L5 9.3 L1.7 6.2 L6.15 5.6 Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" fill="none"/></svg>'; }
+    function forkIcon() { return '<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="3" cy="3" r="1.8" stroke="currentColor" stroke-width="1.3"/><circle cx="13" cy="3" r="1.8" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="13" r="1.8" stroke="currentColor" stroke-width="1.3"/><path d="M3 4.8 V6.5 a2 2 0 0 0 2 2 h6 a2 2 0 0 0 2 -2 V4.8 M8 8 V11.2" stroke="currentColor" stroke-width="1.3" fill="none"/></svg>'; }
+
+    function renderRepos(sortBy) {
+      var list = REPOS.slice();
+      if (sortBy === "updated") {
+        // order as declared (already in time order, most recent first)
+      } else {
+        list.sort(function(a, b) { return b.stars - a.stars; });
+      }
+      var grid = document.getElementById('repoGrid');
+      grid.innerHTML = list.map(function(r) {
+        return '' +
+          '<div class="card repo-card hover-lift">' +
+            '<a class="repo-name mono" href="repos.html">' + r.name + '</a>' +
+            '<p class="desc">' + r.desc + '</p>' +
+            '<div class="meta-row">' +
+              '<span class="item">' + langDot(r.langColor) + r.lang + '</span>' +
+              '<span class="item">' + starIcon() + '<span class="num">' + r.stars + '</span></span>' +
+              '<span class="item">' + forkIcon() + '<span class="num">' + r.forks + '</span></span>' +
+              '<span class="time">Updated ' + r.time + '</span>' +
+            '</div>' +
+          '</div>';
+      }).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      renderRepos('stars');
+
+      var seg = document.getElementById('sortControl');
+      seg.addEventListener('click', function(e) {
+        var btn = e.target.closest('button[data-sort]');
+        if (!btn) return;
+        seg.querySelectorAll('button').forEach(function(b) { b.setAttribute('aria-pressed', 'false'); });
+        btn.setAttribute('aria-pressed', 'true');
+        renderRepos(btn.getAttribute('data-sort'));
+      });
+
+      var input = document.getElementById('topSearch');
+      if (input) {
+        input.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' && input.value.trim()) {
+            window.location.href = 'overview.html?u=' + encodeURIComponent(input.value.trim());
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>

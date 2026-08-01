@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>> gh-dash — charts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css" />
+<style>
+  .content { padding: 28px 0 48px; }
+
+  .caption {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--fg-muted);
+    margin-bottom: 16px;
+  }
+  .caption .handle { color: var(--cyan); }
+  .caption .meta { color: var(--fg-subtle); font-size: 12px; margin-left: 12px; }
+
+  .charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .charts-grid > .card { display: flex; flex-direction: column; }
+
+  .donut-wrap {
+    display: flex; gap: 24px; align-items: center; flex: 1;
+  }
+  .donut {
+    position: relative; width: 160px; height: 160px; flex-shrink: 0;
+  }
+  .donut-svg { display: block; }
+  .donut-center {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    pointer-events: none;
+  }
+  .donut-center .num {
+    font-family: var(--font-mono); font-size: 32px; font-weight: 700;
+    color: var(--fg); line-height: 1;
+  }
+  .donut-center .lbl {
+    font-family: var(--font-mono); font-size: 9px;
+    color: var(--fg-subtle); text-transform: uppercase; letter-spacing: 0.1em;
+    margin-top: 4px;
+  }
+  .donut-legend { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+  .lg-row {
+    display: grid; grid-template-columns: 10px 1fr auto;
+    align-items: center; gap: 8px; font-size: 11px;
+  }
+  .lg-swatch { width: 10px; height: 10px; border-radius: 2px; }
+  .lg-name { color: var(--fg-muted); font-size: 11px; }
+  .lg-pct { color: var(--cyan); font-size: 11px; }
+
+  .bar-chart { display: flex; flex-direction: column; gap: 10px; flex: 1; }
+  .bar-row {
+    display: grid; grid-template-columns: 140px 1fr 48px;
+    align-items: center; gap: 12px;
+    font-size: 12px;
+  }
+  .bar-label { color: var(--fg-muted); font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .bar-track {
+    height: 8px; background: var(--bg-elev-2);
+    border: 1px solid var(--border); border-radius: 2px; overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--cyan), var(--green));
+    box-shadow: 0 0 8px -2px var(--cyan);
+    border-radius: 0 2px 2px 0;
+    animation: barFill 700ms cubic-bezier(0.2,0.7,0.2,1) both;
+  }
+  .bar-count { color: var(--cyan); font-weight: 600; text-align: right; }
+
+  .heat-scroll { overflow-x: auto; padding-bottom: 4px; flex: 1; }
+  .heatmap { display: flex; gap: 2px; min-width: max-content; }
+  .heatweek { display: flex; flex-direction: column; gap: 2px; }
+  .heatweek.y .cell { width: 9px; height: 9px; }
+  .cell {
+    width: 12px; height: 12px; border-radius: 2px;
+    background: var(--green-1);
+    border: 1px solid rgba(0,0,0,0.2);
+    transition: transform 200ms ease, box-shadow 200ms ease;
+  }
+  .cell:hover {
+    transform: scale(1.4);
+    box-shadow: 0 0 6px var(--green);
+    z-index: 2; position: relative;
+  }
+  .cell.lvl-0 { background: var(--bg-elev-2); border-color: var(--border); }
+  .cell.lvl-1 { background: var(--green-1); }
+  .cell.lvl-2 { background: var(--green-2); }
+  .cell.lvl-3 { background: var(--green-3); }
+  .cell.lvl-4 { background: var(--green-4); box-shadow: 0 0 4px -1px var(--green-4); }
+  .heat-footer {
+    margin-top: 12px;
+    font-family: var(--font-mono); font-size: 11px; color: var(--fg-muted);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .heat-legend { display: flex; align-items: center; gap: 6px; }
+  .heat-legend .legend-cell { width: 9px; height: 9px; border-radius: 2px; }
+
+  .line-svg { display: block; width: 100%; }
+  .grid-line { stroke: var(--border); stroke-width: 1; stroke-dasharray: 2 4; }
+  .axis-label { fill: var(--fg-subtle); font-family: var(--font-mono); font-size: 10px; }
+
+  .chart-meta {
+    margin-top: 12px;
+    font-family: var(--font-mono); font-size: 11px; color: var(--fg-muted);
+    display: flex; gap: 16px; flex-wrap: wrap;
+  }
+  .chart-meta .v { color: var(--cyan); }
+  .chart-meta .k { color: var(--fg-subtle); }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="header">
+    <div class="header-inner">
+      <a href="landing.html" class="wordmark"><span class="prompt">&gt;</span><span class="name">gh-dash</span></a>
+      <div class="search-inline">
+        <span class="prefix">$</span>
+        <input type="text" placeholder="search handle..." value="davidsilva131" />
+      </div>
+      <nav class="tabs">
+        <button class="tab" data-tab="overview" onclick="window.location='overview.html'">overview</button>
+        <button class="tab" data-tab="repos" onclick="window.location='repos.html'">repos</button>
+        <button class="tab" data-tab="activity" onclick="window.location='activity.html'">activity</button>
+        <button class="tab active" data-tab="charts">charts</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="content">
+    <div class="container">
+
+      <div class="caption">
+        &gt; analytics @<span class="handle">davidsilva131</span>
+        <span class="meta">all-time · refreshed just now</span>
+      </div>
+
+      <section class="charts-grid">
+
+        <div class="card">
+          <div class="card-title">languages · distribution</div>
+          <div class="donut-wrap">
+            <div class="donut">
+              <svg viewBox="0 0 160 160" width="160" height="160" class="donut-svg"><circle cx="80" cy="80" r="60" fill="none" stroke="var(--bg-elev-2)" stroke-width="18"/><circle cx="80" cy="80" r="60" fill="none" stroke="#278bd1" stroke-width="18" stroke-dasharray="178.32 198.67" stroke-dashoffset="-0.00" transform="rotate(-90 80 80)" /><circle cx="80" cy="80" r="60" fill="none" stroke="#c0de7b" stroke-width="18" stroke-dasharray="68.61 308.38" stroke-dashoffset="-178.32" transform="rotate(-90 80 80)" /><circle cx="80" cy="80" r="60" fill="none" stroke="#cc7533" stroke-width="18" stroke-dasharray="44.48 332.51" stroke-dashoffset="-246.93" transform="rotate(-90 80 80)" /><circle cx="80" cy="80" r="60" fill="none" stroke="#445c96" stroke-width="18" stroke-dasharray="31.67 345.32" stroke-dashoffset="-291.41" transform="rotate(-90 80 80)" /><circle cx="80" cy="80" r="60" fill="none" stroke="#b56851" stroke-width="18" stroke-dasharray="23.00 353.99" stroke-dashoffset="-323.08" transform="rotate(-90 80 80)" /><circle cx="80" cy="80" r="60" fill="none" stroke="#00b5df" stroke-width="18" stroke-dasharray="16.96 360.03" stroke-dashoffset="-346.08" transform="rotate(-90 80 80)" /><circle cx="80" cy="80" r="60" fill="none" stroke="#2a86b7" stroke-width="18" stroke-dasharray="13.95 363.04" stroke-dashoffset="-363.04" transform="rotate(-90 80 80)" /></svg>
+              <div class="donut-center">
+                <div class="num">12</div>
+                <div class="lbl">total langs</div>
+              </div>
+            </div>
+            <div class="donut-legend">
+              
+    <div class="lg-row">
+      <span class="lg-swatch" style="background: #278bd1; box-shadow: 0 0 4px #278bd1;"></span>
+      <span class="lg-name mono">typescript</span>
+      <span class="lg-pct mono">47.3%</span>
+    </div>
+
+    <div class="lg-row">
+      <span class="lg-swatch" style="background: #c0de7b; box-shadow: 0 0 4px #c0de7b;"></span>
+      <span class="lg-name mono">javascript</span>
+      <span class="lg-pct mono">18.2%</span>
+    </div>
+
+    <div class="lg-row">
+      <span class="lg-swatch" style="background: #cc7533; box-shadow: 0 0 4px #cc7533;"></span>
+      <span class="lg-name mono">astro</span>
+      <span class="lg-pct mono">11.8%</span>
+    </div>
+
+    <div class="lg-row">
+      <span class="lg-swatch" style="background: #445c96; box-shadow: 0 0 4px #445c96;"></span>
+      <span class="lg-name mono">css</span>
+      <span class="lg-pct mono">8.4%</span>
+    </div>
+
+    <div class="lg-row">
+      <span class="lg-swatch" style="background: #b56851; box-shadow: 0 0 4px #b56851;"></span>
+      <span class="lg-name mono">html</span>
+      <span class="lg-pct mono">6.1%</span>
+    </div>
+
+    <div class="lg-row">
+      <span class="lg-swatch" style="background: #00b5df; box-shadow: 0 0 4px #00b5df;"></span>
+      <span class="lg-name mono">go</span>
+      <span class="lg-pct mono">4.5%</span>
+    </div>
+
+    <div class="lg-row">
+      <span class="lg-swatch" style="background: #2a86b7; box-shadow: 0 0 4px #2a86b7;"></span>
+      <span class="lg-name mono">python</span>
+      <span class="lg-pct mono">3.7%</span>
+    </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">stars · per repository</div>
+          <div class="bar-chart">
+            
+    <div class="bar-row">
+      <span class="bar-label mono">gh-dash</span>
+      <div class="bar-track">
+        <div class="bar-fill" style="width: 100.0%;"></div>
+      </div>
+      <span class="bar-count mono">247</span>
+    </div>
+
+    <div class="bar-row">
+      <span class="bar-label mono">silva-skills</span>
+      <div class="bar-track">
+        <div class="bar-fill" style="width: 54.3%;"></div>
+      </div>
+      <span class="bar-count mono">134</span>
+    </div>
+
+    <div class="bar-row">
+      <span class="bar-label mono">instaboost-astro</span>
+      <div class="bar-track">
+        <div class="bar-fill" style="width: 36.0%;"></div>
+      </div>
+      <span class="bar-count mono">89</span>
+    </div>
+
+    <div class="bar-row">
+      <span class="bar-label mono">recetas-app</span>
+      <div class="bar-track">
+        <div class="bar-fill" style="width: 22.7%;"></div>
+      </div>
+      <span class="bar-count mono">56</span>
+    </div>
+
+    <div class="bar-row">
+      <span class="bar-label mono">ayverson-portfolio</span>
+      <div class="bar-track">
+        <div class="bar-fill" style="width: 12.6%;"></div>
+      </div>
+      <span class="bar-count mono">31</span>
+    </div>
+
+    <div class="bar-row">
+      <span class="bar-label mono">academieudalioarriaga</span>
+      <div class="bar-track">
+        <div class="bar-fill" style="width: 4.9%;"></div>
+      </div>
+      <span class="bar-count mono">12</span>
+    </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">contributions · 12 months</div>
+          <div class="heat-scroll">
+            <div class="heatmap">
+              <div class="heatweek y"><div class="cell lvl-2"></div><div class="cell lvl-1"></div><div class="cell lvl-3"></div><div class="cell lvl-0"></div><div class="cell lvl-2"></div><div class="cell lvl-0"></div><div class="cell lvl-0"></div></div><div class="heatweek y"><div class="cell lvl-2"></div><div class="cell lvl-0"></div><div class="cell lvl-2"></div><div class="cell lvl-0"></div><div class="cell lvl-0"></div><div class="cell lvl-0"></div><div class="cell lvl-1"></div></div><div class="heatweek y"><div class="cell lvl-1"></div><div class="cell lvl-1"></div><div class="cell lvl-3"></div><div class="cell lvl-4"></div><div class="cell lvl-2"></div><div class="cell lvl-0"></div><div class="cell lvl-2"></div></div><div class="heatweek y"><div class="cell lvl-0"></div><div class="cell lvl-3"></div><div class="cell lvl-1"></div><div class="cell lvl-1"></div><div class="cell lvl-0"></div><div class="cell lvl-0"></div><div class="cell lvl-1"></div></div><div class="heatweek y"><div class="cell lvl-1"></div><div class="cell lvl-2"></div><div class="cell lvl-3"></div><div class="cell lvl-2"></div><div class="cell lvl-2"></div><div class="cell lvl-0"></div><div class="cell lvl-0"></div></div><div class="heatweek y"><div class="cell lvl-1"></div><div class="cell lvl-3"></div><div class="cell lvl-2"></div><div class="cell lvl-1"></div><div class="cell lvl-2"></div><div class="cell lvl-0"></div><div class="cell lvl-0"></div></div><div class="heatweek y"><div class="cell lvl-3"></div><div class="cell lvl-3"></div><div class="cell lvl-1"></div><div class="cell lvl-2"></div><div class="cell lvl-2"></div><div class="cell lvl-1"></div><div class="cell lvl-1"></div></div><div class="heatweek y"><div class="cell lvl-1"></div><div class="cell lvl-4"></div><div class="cell lvl-0"></div><div class="cell lvl-2"></div><div class="cell lvl-3"></div><div class="cell lvl-0"></div><div class="cell lvl-0"></div></div><div class="heatweek y"><div class="cell lvl-0"></div><div class="cell lvl-3"></div><div class="cell lvl-3"></div><div class="cell lvl-2"></div><div class="cell lvl-3"></div><div class="cell lvl-0"></div><div class="cell lvl-1"></div></div><div class="heatweek y"><div class="cell lvl-2"></div><div class="cell lvl-2"></div><div class="cell lvl-2"></div><div class="cell lvl-3"></div><div class="cell lvl-4"></div><div class="cell lvl-0"></div><div class="cell lvl-1"></div></div><div class="heatweek y"><div class="cell lvl-0"></div><div class="cell lvl-3"></div><div class="cell lvl-3"></div><div class="cell lvl-4"></div><div class="cell lvl-3"></div><div class="cell lvl-0"></div><div class="cell lvl-0"></div></div><div class="heatweek y"><div class="cell lvl-3"></div><div class="cell lvl-0"></div><div class="cell lvl-2"></div><div class="cell lvl-1"></div><div class="cell lvl-0"></div><div class="cell lvl-0"></div><div class="cell lvl-1"></div></div><div class="heatweek y"><div class="cell lvl-1"></div><div class="cell lvl-1"></div><div class="cell lvl-2"></div><div class="cell lvl-3"></div><div class="cell lvl-0"></div><div class="cell lvl-0"></div><div class="cell lvl-0"></div></div><div class="heatweek y"><div class="cell lvl-3"></div><div class="cell lvl-3"></div><div class="cell lvl-3"></div><div class="cell lvl-1"></div><div class="cell lvl-2"></div><div class="cell lvl-0"></div><div class="cell lvl-2"></div></div><div class="heatweek y"><div class="cell lvl-4"></div><div class="cell lvl-1"></div><div class="cell lvl-1"></div><div class="cell lvl-1"></div><div class="cell lvl-1"></div><div class="cell lvl-0"></div><div class="cell lvl-0"></div></div><div class="heatweek y"><div class="cell lvl-1"></div><div class="cell lvl-0"></div><div class="cell lvl-2"></div><div class="cell lvl-2"></div><div class="cell lvl-2"></div><div class="cell lvl-2"></div><div class="cell lvl-1"></div></div><div class="heatweek y"><div class="cell lvl-2"></div><div class="cell lvl-2"></div><div class="cell lvl-3"></div><div class="cell lvl-0"></div><div class="cell lvl-3"></div><div class="cell lvl-1"></div><div class="cell lvl-1"></div></div><div class="heatweek y"><div class="cell lvl-3"></div><div class="cell lvl-2"></div><div class="cell lvl-2"></div><div class="cell lvl-0"></div><div class="cell lvl-3"></div><div class="cell lvl-0"></div><div class="cell lvl-0"></div></div><div class="heatweek y"><div class="cell lvl-1"></div><div class="cell lvl-1"></div><div class="cell lvl-2"></div><div class="cell lvl-0"></div><div class="cell lvl-0"></div><div class="cell lvl-0"></div><div class="cell lvl-0"></div></div><div class="heatweek y"><div class="cell lvl-2"></div><div class="cell lvl-0"></div><div class="cell lvl-3"></div><div class="cell lvl-2"></div><div class="cell lvl-1"></div><div class="cell lvl-0"></div><div class="cell lvl-0"></div></div><div class="heatweek y"><div class="cell lvl-2"></div><div class="cell lvl-1"></div><div class="cell lvl-3"></div><div class="cell lvl-4"></div><div class="cell lvl-2"></div><div class="cell lvl-0"></div><div class="cell lvl-0"></div></div><div class="heatweek y"><div class="cell lvl-0"></div><div class="cell lvl-2"></div><div class="cell lvl-1"></div><div class="cell lvl-3"></div><div class="cell lvl-1"></div><div class="cell lvl-0"></div><div class="cell lvl-2"></div></div><div class="heatweek y"><div class="cell lvl-2"></div><div class="cell lvl-1"></div><div class="cell lvl-2"></div><div class="cell lvl-0"></div><div class="cell lvl-2"></div><div class="cell lvl-2"></div><div class="cell lvl-1"></div></div><div class="heatweek y"><div class="cell lvl-3"></div><div class="cell lvl-1"></div><div class="cell lvl-2"></div><div class="cell lvl-1"></div><div class="cell lvl-3"></div><div class="cell lvl-0"></div><div class="cell lvl-1"></div></div><div class="heatweek y"><div class="cell lvl-2"></div><div class="cell lvl-1"></div><div class="cell lvl-3"></div><div class="cell lvl-4"></div><div class="cell lvl-3"></div><div class="cell lvl-1"></div><div class="cell lvl-1"></div></div><div class="heatweek y"><div class="cell lvl-3"></div><div class="cell lvl-1"></div><div class="cell lvl-2"></div><div class="cell lvl-2"></div><div class="cell lvl-0"></div><div class="cell lvl-0"></div><div class="cell lvl-0"></div></div><div class="heatweek y"><div class="cell lvl-1"></div><div class="cell lvl-3"></div><div class="cell lvl-4"></div><div class="cell lvl-2"></div><div class="cell lvl-4"></div><div class="cell lvl-2"></div><div class="cell lvl-2"></div></div><div class="heatweek y"><div class="cell lvl-2"></div><div class="cell lvl-1"></div><div class="cell lvl-1"></div><div class="cell lvl-1"></div><div class="cell lvl-1"></div><div class="cell lvl-1"></div><div class="cell lvl-2"></div></div><div class="heatweek y"><div class="cell lvl-3"></div><div class="cell lvl-2"></div><div class="cell lvl-3"></div><div class="cell lvl-3"></div><div class="cell lvl-0"></div><div class="cell lvl-1"></div><div class="cell lvl-2"></div></div><div class="heatweek y"><div class="cell lvl-3"></div><div class="cell lvl-3"></div><div class="cell lvl-2"></div><div class="cell lvl-1"></div><div class="cell lvl-3"></div><div class="cell lvl-0"></div><div class="cell lvl-1"></div></div><div class="heatweek y"><div class="cell lvl-4"></div><div class="cell lvl-2"></div><div class="cell lvl-2"></div><div class="cell lvl-4"></div><div class="cell lvl-3"></div><div class="cell lvl-0"></div><div class="cell lvl-0"></div></div><div class="heatweek y"><div class="cell lvl-1"></div><div class="cell lvl-4"></div><div class="cell lvl-3"></div><div class="cell lvl-1"></div><div class="cell lvl-3"></div><div class="cell lvl-2"></div><div class="cell lvl-1"></div></div><div class="heatweek y"><div class="cell lvl-2"></div><div class="cell lvl-2"></div><div class="cell lvl-1"></div><div class="cell lvl-0"></div><div class="cell lvl-4"></div><div class="cell lvl-1"></div><div class="cell lvl-0"></div></div><div class="heatweek y"><div class="cell lvl-4"></div><div class="cell lvl-2"></div><div class="cell lvl-3"></div><div class="cell lvl-3"></div><div class="cell lvl-1"></div><div class="cell lvl-0"></div><div class="cell lvl-0"></div></div><div class="heatweek y"><div class="cell lvl-1"></div><div class="cell lvl-2"></div><div class="cell lvl-1"></div><div class="cell lvl-2"></div><div class="cell lvl-1"></div><div class="cell lvl-2"></div><div class="cell lvl-0"></div></div><div class="heatweek y"><div class="cell lvl-2"></div><div class="cell lvl-2"></div><div class="cell lvl-4"></div><div class="cell lvl-2"></div><div class="cell lvl-4"></div><div class="cell lvl-0"></div><div class="cell lvl-0"></div></div><div class="heatweek y"><div class="cell lvl-2"></div><div class="cell lvl-0"></div><div class="cell lvl-2"></div><div class="cell lvl-1"></div><div class="cell lvl-0"></div><div class="cell lvl-1"></div><div class="cell lvl-0"></div></div><div class="heatweek y"><div class="cell lvl-2"></div><div class="cell lvl-3"></div><div class="cell lvl-2"></div><div class="cell lvl-2"></div><div class="cell lvl-2"></div><div class="cell lvl-0"></div><div class="cell lvl-1"></div></div><div class="heatweek y"><div class="cell lvl-0"></div><div class="cell lvl-2"></div><div class="cell lvl-1"></div><div class="cell lvl-1"></div><div class="cell lvl-3"></div><div class="cell lvl-0"></div><div class="cell lvl-0"></div></div><div class="heatweek y"><div class="cell lvl-3"></div><div class="cell lvl-4"></div><div class="cell lvl-2"></div><div class="cell lvl-2"></div><div class="cell lvl-2"></div><div class="cell lvl-0"></div><div class="cell lvl-1"></div></div><div class="heatweek y"><div class="cell lvl-2"></div><div class="cell lvl-2"></div><div class="cell lvl-2"></div><div class="cell lvl-4"></div><div class="cell lvl-3"></div><div class="cell lvl-1"></div><div class="cell lvl-2"></div></div><div class="heatweek y"><div class="cell lvl-1"></div><div class="cell lvl-2"></div><div class="cell lvl-4"></div><div class="cell lvl-3"></div><div class="cell lvl-1"></div><div class="cell lvl-0"></div><div class="cell lvl-0"></div></div><div class="heatweek y"><div class="cell lvl-0"></div><div class="cell lvl-1"></div><div class="cell lvl-0"></div><div class="cell lvl-3"></div><div class="cell lvl-3"></div><div class="cell lvl-2"></div><div class="cell lvl-0"></div></div><div class="heatweek y"><div class="cell lvl-3"></div><div class="cell lvl-3"></div><div class="cell lvl-1"></div><div class="cell lvl-3"></div><div class="cell lvl-4"></div><div class="cell lvl-0"></div><div class="cell lvl-2"></div></div><div class="heatweek y"><div class="cell lvl-2"></div><div class="cell lvl-2"></div><div class="cell lvl-4"></div><div class="cell lvl-3"></div><div class="cell lvl-1"></div><div class="cell lvl-0"></div><div class="cell lvl-0"></div></div><div class="heatweek y"><div class="cell lvl-2"></div><div class="cell lvl-1"></div><div class="cell lvl-1"></div><div class="cell lvl-3"></div><div class="cell lvl-0"></div><div class="cell lvl-0"></div><div class="cell lvl-0"></div></div><div class="heatweek y"><div class="cell lvl-0"></div><div class="cell lvl-2"></div><div class="cell lvl-3"></div><div class="cell lvl-2"></div><div class="cell lvl-0"></div><div class="cell lvl-2"></div><div class="cell lvl-1"></div></div><div class="heatweek y"><div class="cell lvl-4"></div><div class="cell lvl-0"></div><div class="cell lvl-1"></div><div class="cell lvl-0"></div><div class="cell lvl-3"></div><div class="cell lvl-0"></div><div class="cell lvl-0"></div></div><div class="heatweek y"><div class="cell lvl-2"></div><div class="cell lvl-4"></div><div class="cell lvl-3"></div><div class="cell lvl-1"></div><div class="cell lvl-1"></div><div class="cell lvl-2"></div><div class="cell lvl-0"></div></div><div class="heatweek y"><div class="cell lvl-3"></div><div class="cell lvl-0"></div><div class="cell lvl-0"></div><div class="cell lvl-3"></div><div class="cell lvl-2"></div><div class="cell lvl-0"></div><div class="cell lvl-2"></div></div><div class="heatweek y"><div class="cell lvl-3"></div><div class="cell lvl-3"></div><div class="cell lvl-0"></div><div class="cell lvl-3"></div><div class="cell lvl-0"></div><div class="cell lvl-1"></div><div class="cell lvl-0"></div></div><div class="heatweek y"><div class="cell lvl-2"></div><div class="cell lvl-2"></div><div class="cell lvl-4"></div><div class="cell lvl-1"></div><div class="cell lvl-1"></div><div class="cell lvl-0"></div><div class="cell lvl-0"></div></div><div class="heatweek y"><div class="cell lvl-0"></div><div class="cell lvl-1"></div><div class="cell lvl-0"></div><div class="cell lvl-1"></div><div class="cell lvl-1"></div><div class="cell lvl-0"></div><div class="cell lvl-1"></div></div>
+            </div>
+          </div>
+          <div class="heat-footer">
+            <span>&gt; <span style="color: var(--cyan);">2,847</span> contributions in the last year</span>
+            <div class="heat-legend">
+              <span>less</span>
+              <span class="legend-cell" style="background: var(--bg-elev-2); border: 1px solid var(--border);"></span>
+              <span class="legend-cell" style="background: var(--green-1);"></span>
+              <span class="legend-cell" style="background: var(--green-2);"></span>
+              <span class="legend-cell" style="background: var(--green-3);"></span>
+              <span class="legend-cell" style="background: var(--green-4);"></span>
+              <span>more</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">activity · events per month</div>
+          <svg viewBox="0 0 600 220" width="100%" height="220" class="line-svg" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <linearGradient id="areaGrad" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="var(--cyan)" stop-opacity="0.25" />
+      <stop offset="100%" stop-color="var(--cyan)" stop-opacity="0.0" />
+    </linearGradient>
+  </defs>
+  <text x="28" y="19.0" class="axis-label" text-anchor="end">176</text><line x1="36" y1="16.0" x2="584" y2="16.0" class="grid-line" /><text x="28" y="63.0" class="axis-label" text-anchor="end">132</text><line x1="36" y1="60.0" x2="584" y2="60.0" class="grid-line" /><text x="28" y="107.0" class="axis-label" text-anchor="end">88</text><line x1="36" y1="104.0" x2="584" y2="104.0" class="grid-line" /><text x="28" y="151.0" class="axis-label" text-anchor="end">44</text><line x1="36" y1="148.0" x2="584" y2="148.0" class="grid-line" /><text x="28" y="195.0" class="axis-label" text-anchor="end">0</text><line x1="36" y1="192.0" x2="584" y2="192.0" class="grid-line" />
+  <path d="M 36.0,32.0 L 85.8,28.0 L 135.6,32.0 L 185.5,17.0 L 235.3,99.0 L 285.1,100.0 L 334.9,16.0 L 384.7,26.0 L 434.5,100.0 L 484.4,123.0 L 534.2,33.0 L 584.0,70.0 L 584.0,192 L 36.0,192 Z" fill="url(#areaGrad)" />
+  <path d="M 36.0,32.0 L 85.8,28.0 L 135.6,32.0 L 185.5,17.0 L 235.3,99.0 L 285.1,100.0 L 334.9,16.0 L 384.7,26.0 L 434.5,100.0 L 484.4,123.0 L 534.2,33.0 L 584.0,70.0" fill="none" stroke="var(--cyan)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+  <circle cx="36.0" cy="32.0" r="3" fill="var(--cyan)" stroke="var(--bg-elev)" stroke-width="1.5" /><circle cx="36.0" cy="32.0" r="5" fill="transparent" stroke="var(--cyan)" stroke-opacity="0"><title>Jan: 160 events</title></circle><circle cx="85.8" cy="28.0" r="3" fill="var(--cyan)" stroke="var(--bg-elev)" stroke-width="1.5" /><circle cx="85.8" cy="28.0" r="5" fill="transparent" stroke="var(--cyan)" stroke-opacity="0"><title>Feb: 164 events</title></circle><circle cx="135.6" cy="32.0" r="3" fill="var(--cyan)" stroke="var(--bg-elev)" stroke-width="1.5" /><circle cx="135.6" cy="32.0" r="5" fill="transparent" stroke="var(--cyan)" stroke-opacity="0"><title>Mar: 160 events</title></circle><circle cx="185.5" cy="17.0" r="3" fill="var(--cyan)" stroke="var(--bg-elev)" stroke-width="1.5" /><circle cx="185.5" cy="17.0" r="5" fill="transparent" stroke="var(--cyan)" stroke-opacity="0"><title>Apr: 175 events</title></circle><circle cx="235.3" cy="99.0" r="3" fill="var(--cyan)" stroke="var(--bg-elev)" stroke-width="1.5" /><circle cx="235.3" cy="99.0" r="5" fill="transparent" stroke="var(--cyan)" stroke-opacity="0"><title>May: 93 events</title></circle><circle cx="285.1" cy="100.0" r="3" fill="var(--cyan)" stroke="var(--bg-elev)" stroke-width="1.5" /><circle cx="285.1" cy="100.0" r="5" fill="transparent" stroke="var(--cyan)" stroke-opacity="0"><title>Jun: 92 events</title></circle><circle cx="334.9" cy="16.0" r="3" fill="var(--cyan)" stroke="var(--bg-elev)" stroke-width="1.5" /><circle cx="334.9" cy="16.0" r="5" fill="transparent" stroke="var(--cyan)" stroke-opacity="0"><title>Jul: 176 events</title></circle><circle cx="384.7" cy="26.0" r="3" fill="var(--cyan)" stroke="var(--bg-elev)" stroke-width="1.5" /><circle cx="384.7" cy="26.0" r="5" fill="transparent" stroke="var(--cyan)" stroke-opacity="0"><title>Aug: 166 events</title></circle><circle cx="434.5" cy="100.0" r="3" fill="var(--cyan)" stroke="var(--bg-elev)" stroke-width="1.5" /><circle cx="434.5" cy="100.0" r="5" fill="transparent" stroke="var(--cyan)" stroke-opacity="0"><title>Sep: 92 events</title></circle><circle cx="484.4" cy="123.0" r="3" fill="var(--cyan)" stroke="var(--bg-elev)" stroke-width="1.5" /><circle cx="484.4" cy="123.0" r="5" fill="transparent" stroke="var(--cyan)" stroke-opacity="0"><title>Oct: 69 events</title></circle><circle cx="534.2" cy="33.0" r="3" fill="var(--cyan)" stroke="var(--bg-elev)" stroke-width="1.5" /><circle cx="534.2" cy="33.0" r="5" fill="transparent" stroke="var(--cyan)" stroke-opacity="0"><title>Nov: 159 events</title></circle><circle cx="584.0" cy="70.0" r="3" fill="var(--cyan)" stroke="var(--bg-elev)" stroke-width="1.5" /><circle cx="584.0" cy="70.0" r="5" fill="transparent" stroke="var(--cyan)" stroke-opacity="0"><title>Dec: 122 events</title></circle>
+  <text x="36.0" y="212" class="axis-label" text-anchor="middle">Jan</text><text x="85.8" y="212" class="axis-label" text-anchor="middle">Feb</text><text x="135.6" y="212" class="axis-label" text-anchor="middle">Mar</text><text x="185.5" y="212" class="axis-label" text-anchor="middle">Apr</text><text x="235.3" y="212" class="axis-label" text-anchor="middle">May</text><text x="285.1" y="212" class="axis-label" text-anchor="middle">Jun</text><text x="334.9" y="212" class="axis-label" text-anchor="middle">Jul</text><text x="384.7" y="212" class="axis-label" text-anchor="middle">Aug</text><text x="434.5" y="212" class="axis-label" text-anchor="middle">Sep</text><text x="484.4" y="212" class="axis-label" text-anchor="middle">Oct</text><text x="534.2" y="212" class="axis-label" text-anchor="middle">Nov</text><text x="584.0" y="212" class="axis-label" text-anchor="middle">Dec</text>
+</svg>
+          <div class="chart-meta">
+            <span><span class="k">peak:</span> <span class="v">176</span> in <span class="v">Jul</span></span>
+            <span><span class="k">avg:</span> <span class="v">135</span>/mo</span>
+            <span><span class="k">total:</span> <span class="v">1,628</span> events</span>
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-line">
+        &gt; built with: <span class="accent">astro</span> · <span class="accent">react</span> · <span class="accent">tailwind</span> · <span class="accent">shadcn/ui</span> · <span class="accent">recharts</span>
+      </div>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', (e) => {
+      const tab = t.dataset.tab;
+      if (!tab || tab === 'charts') {
+        e.preventDefault();
+        document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+        t.classList.add('active');
+      }
+    });
+  });
+</script>
+</body>
+</html>

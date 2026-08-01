@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>> gh-dash — user_not_found</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css" />
+<style>
+  body { display: flex; flex-direction: column; min-height: 100vh; }
+  .error-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+    position: relative;
+  }
+  .error-wrap::before {
+    content: "";
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 700px; height: 700px;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(255, 95, 135, 0.05) 0%, transparent 65%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .error-card {
+    position: relative;
+    z-index: 1;
+    max-width: 520px;
+    width: 100%;
+    background: var(--bg-elev);
+    border: 1px solid var(--border-bright);
+    border-radius: var(--radius);
+    padding: 36px 32px;
+    text-align: center;
+    font-family: var(--font-mono);
+    animation: fadeUp 400ms ease-out;
+    overflow: hidden;
+  }
+  .error-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      0deg, transparent, transparent 3px,
+      rgba(255, 95, 135, 0.04) 3px, rgba(255, 95, 135, 0.04) 4px
+    );
+  }
+  .error-bang {
+    font-family: var(--font-mono);
+    font-size: 64px;
+    font-weight: 700;
+    color: var(--magenta);
+    line-height: 1;
+    margin-bottom: 8px;
+    text-shadow: 0 0 20px rgba(255, 95, 135, 0.5);
+    animation: pulse 2s ease-in-out infinite;
+    color: var(--magenta);
+    display: inline-block;
+  }
+  .error-code {
+    font-family: var(--font-mono);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--amber);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 16px;
+    position: relative;
+    z-index: 1;
+  }
+  .error-msg {
+    font-size: 13px;
+    color: var(--fg-muted);
+    margin-bottom: 24px;
+    line-height: 1.6;
+    position: relative;
+    z-index: 1;
+  }
+  .error-msg .query { color: var(--cyan); }
+  .error-detail {
+    background: var(--bg-elev-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 11px;
+    color: var(--fg-subtle);
+    margin-bottom: 24px;
+    line-height: 1.7;
+    position: relative;
+    z-index: 1;
+  }
+  .error-detail .line::before { content: "> "; color: var(--cyan); }
+  .error-detail .line.warn::before { content: "! "; color: var(--amber); }
+  .error-detail .line.err::before  { content: "✗ "; color: var(--magenta); }
+  .error-detail .line .key { color: var(--fg-muted); }
+  .error-detail .line .val { color: var(--fg); }
+  .error-detail .line .v404 { color: var(--magenta); }
+
+  .btn-retry {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    color: var(--cyan);
+    border: 1px solid var(--cyan);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 12px 24px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background 200ms ease, box-shadow 200ms ease;
+    text-decoration: none;
+    position: relative;
+    z-index: 1;
+  }
+  .btn-retry:hover {
+    background: rgba(0, 217, 255, 0.1);
+    box-shadow: 0 0 16px -4px var(--cyan);
+    text-decoration: none;
+  }
+  .btn-retry:active { transform: translateY(1px); }
+
+  .footer-note {
+    margin-top: 20px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--fg-subtle);
+    position: relative;
+    z-index: 1;
+  }
+  .footer-note a { color: var(--cyan); }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="header">
+    <div class="header-inner">
+      <a href="landing.html" class="wordmark"><span class="prompt">&gt;</span><span class="name">gh-dash</span></a>
+      <div class="search-inline">
+        <span class="prefix">$</span>
+        <input type="text" placeholder="search handle..." value="thisuser-doesntexist-9384" />
+      </div>
+      <nav class="tabs">
+        <button class="tab" data-tab="overview" onclick="window.location='overview.html'">overview</button>
+        <button class="tab" data-tab="repos" onclick="window.location='repos.html'">repos</button>
+        <button class="tab" data-tab="activity" onclick="window.location='activity.html'">activity</button>
+        <button class="tab" data-tab="charts" onclick="window.location='charts.html'">charts</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="error-wrap">
+    <div class="error-card">
+      <div class="error-bang">!</div>
+      <div class="error-code">USER_NOT_FOUND</div>
+      <p class="error-msg">// check the username and try again.<br>the handle <span class="query">@thisuser-doesntexist-9384</span> returned no results from the github api.</p>
+
+      <div class="error-detail">
+        <div class="line err"><span class="key">GET</span> /users/<span class="val">thisuser-doesntexist-9384</span> &rarr; <span class="v404">404 NOT FOUND</span></div>
+        <div class="line warn"><span class="key">hint</span> <span class="val">usernames are case-insensitive · 1-39 chars · alphanum + dashes</span></div>
+        <div class="line"><span class="key">took</span> <span class="val">217ms</span> · <span class="key">retry-after</span> <span class="val">0s</span></div>
+      </div>
+
+      <a href="landing.html" class="btn-retry">[ RETRY ]</a>
+
+      <div class="footer-note">&gt; or pick a working handle from <a href="landing.html">/landing</a></div>
+    </div>
+  </main>
+
+</div>
+
+<script>
+  // No tab active since this is an error state
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.location = t.dataset.tab + '.html';
+    });
+  });
+</script>
+</body>
+</html>
