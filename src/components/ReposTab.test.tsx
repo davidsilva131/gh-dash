@@ -5,6 +5,20 @@ import ReposTab from "./ReposTab";
 import RepoCard from "./RepoCard";
 import { SAMPLE_USER } from "../test/fixtures";
 import { SAMPLE_USER_DATA } from "../test/fixtures";
+import type { GitHubUserData } from "../lib/types";
+
+const UNSORTED_DATA: GitHubUserData = {
+  profile: { login: "testuser", name: null, avatarUrl: "", bio: null, company: null, location: null, blog: "", followers: 0, following: 0 },
+  stats: { publicRepos: 3, totalStars: 25 },
+  languages: [],
+  contributions: [],
+  repos: [
+    { name: "repo-a", description: null, language: null, languageColor: null, stars: 5, forks: 0, updatedAt: "2024-03-10T00:00:00Z", url: "https://github.com/test/repo-a" },
+    { name: "repo-b", description: null, language: null, languageColor: null, stars: 12, forks: 0, updatedAt: "2024-01-01T00:00:00Z", url: "https://github.com/test/repo-b" },
+    { name: "repo-c", description: null, language: null, languageColor: null, stars: 8, forks: 0, updatedAt: "2024-06-15T00:00:00Z", url: "https://github.com/test/repo-c" },
+  ],
+  activity: [],
+};
 
 describe("ReposTab", () => {
   it("renders the repository count", () => {
@@ -82,6 +96,20 @@ describe("ReposTab", () => {
     expect(screen.getByText("2 repositories")).toBeInTheDocument();
     expect(screen.getByText("repo-a")).toBeInTheDocument();
     expect(screen.getByText("repo-b")).toBeInTheDocument();
+  });
+
+  it("sorts repos by stars descending by default", () => {
+    const { container } = render(<ReposTab username="testuser" data={UNSORTED_DATA} />);
+    const titles = [...container.querySelectorAll("[data-slot='card-title']")].map((el) => el.textContent);
+    expect(titles).toEqual(["repo-b", "repo-c", "repo-a"]);
+  });
+
+  it("re-sorts repos by most recently updated when clicked", async () => {
+    const user = userEvent.setup();
+    const { container } = render(<ReposTab username="testuser" data={UNSORTED_DATA} />);
+    await user.click(screen.getByRole("button", { name: "Recently Updated" }));
+    const titles = [...container.querySelectorAll("[data-slot='card-title']")].map((el) => el.textContent);
+    expect(titles).toEqual(["repo-c", "repo-a", "repo-b"]);
   });
 
 });

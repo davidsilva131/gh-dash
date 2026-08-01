@@ -39,7 +39,9 @@ export default function ReposTab({ username, data, isLoading, error, onRetry }: 
     );
   }
 
-  const repos = data.repos;
+  const repos = [...data.repos].sort((a, b) =>
+    sortBy === "stars" ? b.stars - a.stars : b.updatedAt.localeCompare(a.updatedAt),
+  );
 
   return (
     <div className="space-y-4">
