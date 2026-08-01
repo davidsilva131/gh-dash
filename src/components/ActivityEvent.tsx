@@ -1,4 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
+import { formatRelativeTime } from "../lib/dates";
 import { Badge } from "@/components/ui/badge";
 
 type EventType = "PushEvent" | "PullRequestEvent" | "IssuesEvent" | "WatchEvent" | "CreateEvent" | "ForkEvent";
@@ -34,7 +35,7 @@ export default function ActivityEvent({ type, repo, title, time }: ActivityEvent
         </div>
         <div className="shrink-0 flex items-center gap-2">
           <Badge variant={config.variant} className="text-xs">{config.label}</Badge>
-          <span className="text-xs text-muted-foreground whitespace-nowrap">{time}</span>
+          <span className="text-xs text-muted-foreground whitespace-nowrap">{formatRelativeTime(time)}</span>
         </div>
       </CardContent>
     </Card>

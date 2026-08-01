@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import ActivityTab from "./ActivityTab";
 import ActivityEvent from "./ActivityEvent";
@@ -66,6 +66,10 @@ describe("ActivityTab", () => {
 });
 
 describe("ActivityEvent", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it.each([
     ["PushEvent", "Push", "P"],
     ["PullRequestEvent", "PR", "R"],
@@ -76,12 +80,14 @@ describe("ActivityEvent", () => {
   ] as const)(
     "renders the %s event with icon, badge label, title, repo, and time",
     (type, label, icon) => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date("2024-06-01T12:00:00Z"));
       render(
         <ActivityEvent
           type={type}
           repo="owner/repo"
           title="Some activity"
-          time="1 hour ago"
+          time="2024-06-01T11:00:00Z"
         />
       );
       expect(screen.getByText(icon)).toBeInTheDocument();

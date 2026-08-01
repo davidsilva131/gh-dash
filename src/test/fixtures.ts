@@ -31,7 +31,7 @@ export const SAMPLE_REPOS: Repo[] = [
     languageColor: "#3178c6",
     stars: 12,
     forks: 3,
-    updatedAt: "2 days ago",
+    updatedAt: "2024-06-01T10:00:00Z",
     url: "https://github.com/davidsilva131/LotoPetsPlay",
   },
   {
@@ -41,7 +41,7 @@ export const SAMPLE_REPOS: Repo[] = [
     languageColor: "#3572A5",
     stars: 8,
     forks: 2,
-    updatedAt: "1 week ago",
+    updatedAt: "2024-05-25T10:00:00Z",
     url: "https://github.com/davidsilva131/MyTodo-back",
   },
   {
@@ -51,7 +51,7 @@ export const SAMPLE_REPOS: Repo[] = [
     languageColor: "#3178c6",
     stars: 5,
     forks: 1,
-    updatedAt: "just now",
+    updatedAt: "2024-06-01T11:59:30Z",
     url: "https://github.com/davidsilva131/gh-dash",
   },
   {
@@ -61,7 +61,7 @@ export const SAMPLE_REPOS: Repo[] = [
     languageColor: "#f1e05a",
     stars: 3,
     forks: 0,
-    updatedAt: "3 weeks ago",
+    updatedAt: "2024-05-11T10:00:00Z",
     url: "https://github.com/davidsilva131/portfolio",
   },
   {
@@ -71,7 +71,7 @@ export const SAMPLE_REPOS: Repo[] = [
     languageColor: "#89e051",
     stars: 2,
     forks: 1,
-    updatedAt: "1 month ago",
+    updatedAt: "2024-05-01T10:00:00Z",
     url: "https://github.com/davidsilva131/dotfiles",
   },
   {
@@ -81,7 +81,7 @@ export const SAMPLE_REPOS: Repo[] = [
     languageColor: "#dea584",
     stars: 7,
     forks: 0,
-    updatedAt: "2 months ago",
+    updatedAt: "2024-04-01T10:00:00Z",
     url: "https://github.com/davidsilva131/rust-adventures",
   },
 ];

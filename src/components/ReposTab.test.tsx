@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import ReposTab from "./ReposTab";
@@ -115,7 +115,13 @@ describe("ReposTab", () => {
 });
 
 describe("RepoCard", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it("renders all repo fields including the language color dot", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2024-06-01T12:00:00Z"));
     const { container } = render(
       <RepoCard
         name="gh-dash"
@@ -123,7 +129,7 @@ describe("RepoCard", () => {
         language="TypeScript"
         stars={5}
         forks={1}
-        updatedAt="2 days ago"
+        updatedAt="2024-05-30T12:00:00Z"
       />
     );
     expect(screen.getByText("gh-dash")).toBeInTheDocument();

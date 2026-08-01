@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatRelativeTime } from "../lib/dates";
 import { Badge } from "@/components/ui/badge";
 
 interface RepoCardProps {
@@ -56,7 +57,7 @@ export default function RepoCard({
           )}
           <span className="flex items-center gap-1">&#9733; {stars}</span>
           <span className="flex items-center gap-1">&#9733; {forks}</span>
-          <span className="ml-auto">{updatedAt}</span>
+          <span className="ml-auto">{formatRelativeTime(updatedAt)}</span>
         </div>
       </CardContent>
     </Card>
